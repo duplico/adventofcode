@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
      int32_t y_offset;
      char *ptr;
      uint16_t *trees_each_run;
-     uint32_t trees_multiplied;
+     uint64_t trees_multiplied;
 
      // Validate input (to the extent we can be bothered)
      if (argc < 4 || (argc % 2) != 0) {
@@ -102,6 +102,8 @@ int main(int argc, char *argv[]) {
      for (uint16_t i=0; i<num_runs; i++) {
           trees_multiplied *= trees_each_run[i];
      }
+
+     free(trees_each_run);
 
      printf("Total trees hit product: %d\n", trees_multiplied);
 
