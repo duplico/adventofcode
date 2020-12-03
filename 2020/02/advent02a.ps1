@@ -1,6 +1,6 @@
 Param ($InputFile="input.txt")
 
-$invalid_count = 0
+$valid_count = 0
 $total_count = 0
 
 # NB: Memory performance of Get-Content is potentially bad;
@@ -10,8 +10,8 @@ $total_count = 0
 Get-Content $InputFile | ForEach-Object {
      if ($_ -match '(?<Min>\d+)\-(?<Max>\d+) (?<Letter>.): (?<Password>.+)') {
           $char_count = ($Matches.Password.ToCharArray() -eq $Matches.Letter).count
-          if ($char_count -gt $Matches.Max -or $char_count -lt $Matches.Min) {
-               $invalid_count++
+          if ($char_count -le $Matches.Max -and $char_count -ge $Matches.Min) {
+               $valid_count++
           }
           $total_count++
      } else {
@@ -19,4 +19,4 @@ Get-Content $InputFile | ForEach-Object {
      }
 }
 
-Write-Output "Invalid passwords: $invalid_count of $total_count"
+Write-Output "Valid passwords: $valid_count of $total_count"
