@@ -5,19 +5,30 @@
      "version": "0.2.0",
      "configurations": [
           {
+               "type": "java",
+               "name": "Debug (Launch) with Arguments Prompt",
+               "request": "launch",
+               "mainClass": "",
+               "args": "${command:SpecifyProgramArgs}"
+          },
+          {
                "name": "PowerShell Launch Current File",
                "type": "PowerShell",
                "request": "launch",
                "script": "${file}",
-               "args": ["input.txt"],
-               "cwd": "${fileDirname}",
+               "args": [
+                    "input.txt"
+               ],
+               "cwd": "${fileDirname}"
           },
           {
                "name": "Python: Current File",
                "type": "python",
                "request": "launch",
                "program": "${file}",
-               "args": ["input.txt"],
+               "args": [
+                    "input.txt"
+               ],
                "console": "integratedTerminal",
                "cwd": "${fileDirname}"
           }
