@@ -1,4 +1,4 @@
-(ns advent04a
+(ns advent05a
   (:require [clojure.string :as str] clojure.java.io))
 
 (defn row-col-number [min max spec]
