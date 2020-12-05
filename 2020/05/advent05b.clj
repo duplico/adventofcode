@@ -5,7 +5,7 @@
   (if (= min max)
     min
     (let [mid (quot (+ max min) 2)]
-      (if (or (str/starts-with? spec "F") (str/starts-with? spec "L")) ; TODO: error handling
+      (if (or (str/starts-with? spec "F") (str/starts-with? spec "L"))
         (recur min mid (subs spec 1)) ; Front or Left
         (recur (+ mid 1) max (subs spec 1))))))
 
@@ -22,4 +22,4 @@
     (recur (next seats))
     (inc (first seats))))
 
-(println (missing-seat-id (all-seat-ids "input.txt")))
+(println (missing-seat-id (all-seat-ids (first *command-line-args*))))
