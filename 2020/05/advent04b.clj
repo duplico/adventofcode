@@ -18,8 +18,8 @@
     (sort (seq (map seat-id (line-seq input))))))
 
 (defn missing-seat-id [seats]
-  (if (= (+ (first seats) 1) (second seats))
+  (if (= (inc (first seats)) (second seats))
     (recur (next seats))
-    (+ (first seats) 1)))
+    (inc (first seats))))
 
 (println (missing-seat-id (all-seat-ids "input.txt")))
