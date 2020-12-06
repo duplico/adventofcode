@@ -41,6 +41,7 @@ int num_trees(uint16_t x_offset, uint16_t y_offset, char *input_file) {
           //  A y_offset of 1 should mean that we will check every line.
           if (skip != y_offset) {
                skip++;
+               fprintf(stderr, "%s", line);
                continue;
           } else {
                skip = 1;
@@ -49,7 +50,12 @@ int num_trees(uint16_t x_offset, uint16_t y_offset, char *input_file) {
           if (line[x_index] == '#') {
                // Tree!
                trees++;
+               line[x_index] = 'X';
+          } else {
+               line[x_index] = 'O';
           }
+          
+          fprintf(stderr, "%s", line);
 
           // Increment x_index for the next iteration.
           x_index = (x_index + x_offset) % width;
@@ -63,7 +69,7 @@ int num_trees(uint16_t x_offset, uint16_t y_offset, char *input_file) {
 int main(int argc, char *argv[]) {
      int32_t x_offset;
      int32_t y_offset;
-     char *ptr;
+     char **ptr;
      uint16_t *trees_each_run;
      uint64_t trees_multiplied;
 
@@ -105,7 +111,7 @@ int main(int argc, char *argv[]) {
 
      free(trees_each_run);
 
-     printf("Total trees hit product: %d\n", trees_multiplied);
+     printf("Total trees hit product: %lu\n", trees_multiplied);
 
      return 0;
 }
