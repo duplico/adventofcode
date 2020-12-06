@@ -1,23 +1,23 @@
 import java.io.File
 
 fun main() {
-     var totalCount : Int = 0;
-     val groupQuestions = mutableSetOf<Char>();
+     var groupAnswers = mutableListOf<Set<Char>>()
+     var allGroupAnswers = mutableListOf<List<Set<Char>>>()
 
      File("input.txt").forEachLine { 
           if (it == "") {
                // We've hit a blank line. Time to accumulate the current count,
                //  and clear our set.
-               totalCount += groupQuestions.size
-               groupQuestions.clear()
-          }
-          for (c in it) {
-               groupQuestions.add(c)
+               allGroupAnswers.add(groupAnswers)
+               groupAnswers = mutableListOf<Set<Char>>()
+          } else {
+               groupAnswers.add(it.toSet())
           }
      }
 
-     // Finally, add the last group's questions to the total.
-     totalCount += groupQuestions.size
+     allGroupAnswers.add(groupAnswers)
 
-     println(totalCount)
+     var answerCount = allGroupAnswers.map({group -> group.reduce({ a, b -> a union b}).size}).reduce({a, b -> a + b})
+
+     println(answerCount)
 }
