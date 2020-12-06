@@ -7,6 +7,9 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 
+// NOTE: To run properly, this requires picocli - put CommandLine.java into the picocli directory.
+//  $ wget https://github.com/remkop/picocli/raw/master/src/main/java/picocli/CommandLine.java
+
 @Command(name = "advent4a", mixinStandardHelpOptions = true, description = "Solve the 2020 Advent of Code day 4 passport part 1.")
 class Advent4A implements Callable<Integer> {
 
