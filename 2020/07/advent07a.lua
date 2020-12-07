@@ -61,6 +61,25 @@ function Recordbags(filename)
   end
 end
 
+-- Returns how many bag colors can possibly hold an `enclosedbag` color bag.
+-- NB: This currently double counts.
+function Howmanybagshold(enclosedbag)
+  local count = 0
+
+  -- Here's our base case: If `enclosedbag` isn't in the table, then
+  --  nothing can hold it, so we return 0.
+  if not Bags[enclosedbag] then
+    return 0
+  end
+
+  for enclosingbags, ct in pairs(Bags[enclosedbag]) do
+    -- NB: This is NOT tail recursive, so things could get ugly for very large
+    --     input sizes.
+    print(enclosingbags, ct)
+    count = count + 1 + Howmanybagshold(enclosingbags)
+  end
+  return count
+end
 
 -- Produce a string representation of a (possibly nested) table.
 -- From Matt on Stack Overflow at <https://stackoverflow.com/a/27028488>
@@ -81,5 +100,7 @@ end
 
 -- And we're off to see the wizard.
 Recordbags('sample_input.txt')
-
 print(dump(Bags))
+print(Howmanybagshold("shiny gold"))
+
+
