@@ -5,6 +5,7 @@
 -- For example, we might have Bags["shiny gold"]["hearing aid beige"] == 3,
 --  meaning that a hearing aid beige bag may contain 3 shiny gold bags.
 Bags = {}
+Externalbags = {}
 
 -- Given a `bagname` and a valid `contents` string, populate `Bags` with the association.
 -- A "contents string" is defined as anything that can validly follow "contains" on a
@@ -13,7 +14,7 @@ Bags = {}
 --  bag's complete description in the contents string can result in either a fixed
 --  value (in this case, the empty string), or another valid contents string.
 function RecordBagContents(bagname, contents)
-  print(bagname, contents)
+  -- print(bagname, contents)
   -- This if statement gets us our base case.
   -- If the contents string is "no other bags", then this is a bag that
   --  is not allowed to contain any other bags. If the contents string
@@ -62,7 +63,9 @@ function Recordbags(filename)
 end
 
 -- Returns how many bag colors can possibly hold an `enclosedbag` color bag.
--- NB: This currently double counts.
+--  This function depends on side effects, namely storing a running table of
+--  how many times each bag has been visited in `Externalbags`, in order to
+--  avoid double-counting.
 function Howmanybagshold(enclosedbag)
   local count = 0
 
@@ -72,11 +75,27 @@ function Howmanybagshold(enclosedbag)
     return 0
   end
 
-  for enclosingbags, ct in pairs(Bags[enclosedbag]) do
+  for enclosingbag, ct in pairs(Bags[enclosedbag]) do
     -- NB: This is NOT tail recursive, so things could get ugly for very large
     --     input sizes.
-    print(enclosingbags, ct)
-    count = count + 1 + Howmanybagshold(enclosingbags)
+
+    -- If we have not yet counted this enclosing bag, then add it to the table
+    --  with a zero value, and increment our local count.
+    if Externalbags[enclosingbag] == nil then
+      Externalbags[enclosingbag] = 0
+      -- Increment the running size of the table.
+      -- TODO: Is this needed? I should read the lua docs more for this.
+      table.setn(Externalbags, table.getn(Externalbags)+1)
+      -- Increment our local count, which we'll be returning.
+      count = count + 1
+    end
+    -- Increment the number of times that enclosingbag has been reached
+    --  as a candidate for an outermost bag.
+    Externalbags[enclosingbag] = Externalbags[enclosingbag] + 1
+    -- Recurse. (Again, note: because this is called in a loop, possibly
+    --  even multiple times prior to recursing, plus being part of an
+    --  arithmetic expression, this is NOT tail recursion.
+    count = count + Howmanybagshold(enclosingbag)
   end
   return count
 end
@@ -99,8 +118,6 @@ function dump(o)
 end
 
 -- And we're off to see the wizard.
-Recordbags('sample_input.txt')
-print(dump(Bags))
+Recordbags('input.txt')
+
 print(Howmanybagshold("shiny gold"))
-
-
