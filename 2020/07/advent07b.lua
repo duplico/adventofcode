@@ -2,7 +2,7 @@
 -- Note that this directly corresponds to the order of the specification of the
 --  input file, which is the OPPOSITE of what the part 1 solution does.
 -- For example, we might have Bags["shiny gold"]["hearing aid beige"] == 3,
---  meaning that a shiny gold bag may contain 3 hearing aid beige.
+--  meaning that a shiny gold bag may contain 3 hearing aid beige bags.
 Bags = {}
 
 -- Given a `bagname` and a valid `contents` string, populate `Bags` with the association.
@@ -27,7 +27,7 @@ function RecordBagContents(bagname, contents)
   -- This is the general case: the contents string contains at least one
   --  bag that may be enclosed in a `bagname` bag. Identify, non-greedily
   --  (hence `(.-)`) the first bag's `number` and `color`, storing the
-  --  remainder of 
+  --  remainder for later processing.
   local number, color, remainder = string.match(contents, "(%d) (.-) bags?[,.]%s?(.*)")
   
   if Bags[bagname] == nil then

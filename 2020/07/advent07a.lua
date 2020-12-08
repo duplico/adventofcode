@@ -27,7 +27,7 @@ function RecordBagContents(bagname, contents)
   -- This is the general case: the contents string contains at least one
   --  bag that may be enclosed in a `bagname` bag. Identify, non-greedily
   --  (hence `(.-)`) the first bag's `number` and `color`, storing the
-  --  remainder of 
+  --  remainder for later processing.
   local number, color, remainder = string.match(contents, "(%d) (.-) bags?[,.]%s?(.*)")
   
   -- 
