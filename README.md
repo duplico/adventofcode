@@ -16,3 +16,4 @@ problem in a different language.
 6. Kotlin
 7. Lua
 8. Perl
+9. Chapel
