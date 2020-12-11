@@ -11,7 +11,7 @@ if (args.size() > 1) {
      input_path = args[0]
 }
 
-// Load the lines from the file into a list, and sort it in
+// Load the lines from the file into an array, and sort it in
 //  ascending order.
 File inputFile = new File(input_path)
 def joltages = inputFile.readLines() as Integer[]
