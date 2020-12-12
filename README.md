@@ -19,3 +19,5 @@ problem in a different language.
 7. Lua
 8. Perl
 9. Chapel
+10. Groovy
+11. R
