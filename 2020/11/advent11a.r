@@ -2,7 +2,7 @@ lines <- scan("input.txt", character(), quote="")
 chars <- strsplit(lines, "")
 seats <- do.call(rbind, chars)
 
-# The plane's dimensions:
+# The boat's dimensions:
 r <- nrow(seats)
 c <- ncol(seats)
 
@@ -18,7 +18,7 @@ c <- ncol(seats)
 floor <- matrix(0, r, c)
 floor[seats=="."] <- 1
 
-curr_layout <- matrix(0, r, c) # Airplanes start empty.
+curr_layout <- matrix(0, r, c) # Boats start empty.
 prev_layout <- matrix(2, r, c) # Create an invalid "previous" layout
 
 # Now we've got a floor mask (floor), and a matrix of where people are
