@@ -42,6 +42,33 @@ shift_diag_up <- function(mat) {
      return(mat)
 }
 
+smear_right <- function(mat) {
+
+     mat <- t(apply(mat, 1, cummax)) # Smear any 1s we find all the way RIGHT
+     mat <- cbind(rep(0, r), mat[,-ncol(mat)]) # Shift values RIGHT into a new matrix
+
+     return(mat)
+}
+
+smear_left <- function(mat) {
+     mat <- t(apply(apply(apply(mat, 1, rev), 2, cummax), 2, rev)) # Smear LEFT
+     mat <- cbind(mat[,-1], rep(0, nrow(mat))) # Shift values LEFT into a new matrix
+
+     return(mat)
+}
+
+smear_up <- function(mat) {
+     mat <- apply(apply(apply(mat, 2, rev), 2, cummax), 2, rev) # Smear 1s all the way UP
+     mat <- rbind(mat[-1,], rep(0, ncol(mat))) # Shift values UP into a new matrix
+     return(mat)
+}
+
+smear_down <- function(mat) {
+     mat <- apply(mat, 2, cummax) # Smear any 1s we find all the way DOWN
+     mat <- rbind(rep(0, ncol(mat)), mat[-nrow(mat),]) # Shift values DOWN into a new matrix
+     return(mat)
+}
+
 lines <- scan("sample_input.txt", character(), quote="")
 chars <- strsplit(lines, "")
 seats <- do.call(rbind, chars)
@@ -81,11 +108,6 @@ while (!all(curr_layout == prev_layout)) {
      #  "smearing" because we're basically looking for the first 1 and
      #  then putting that 1 everywhere after it.
 
-     # Then, for the diagonal version we will take those and SHIFT them,
-     #  row-wise, to turn the straight lines into diagonal ones.
-     #  That is, for instance, row 1 isn't shifted at all; row 2 is shifted
-     #  by 1 element, row 3 by 2, etc.
-
      # First, we need to accomplish the smearing task. This is done with a series
      #  of gross-looking matrix operations, which boil down to applying the
      #  `cummax` function row-wise or column-wise. For everything but top-down
@@ -95,22 +117,29 @@ while (!all(curr_layout == prev_layout)) {
      # We also need to keep our SHIFTING behavior, because this approach
      #  incorrectly counts each seat as visible to itself.
 
-     cnt_from_u <- apply(curr_layout, 2, cummax) # Smear any 1s we find all the way DOWN
-     cnt_from_u <- rbind(rep(0, c), cnt_from_u[-r,]) # Shift values DOWN into a new matrix
+     cnt_from_u <- smear_down(curr_layout)
+     cnt_from_l <- smear_right(curr_layout)
+     cnt_from_r <- smear_left(curr_layout)
+     cnt_from_d <- smear_up(curr_layout)
 
-     cnt_from_l <- t(apply(curr_layout, 1, cummax)) # Smear any 1s we find all the way RIGHT
-     cnt_from_l <- cbind(rep(0, r), cnt_from_l[,-c]) # Shift values RIGHT into a new matrix
+     # Now, it's time for the diagonal ones. These are a little complicated,
+     #  but work by shifting, smearing, and unshifting. For example, to smear
+     #  diagonally down and to the right, we must shift every column up by
+     #  its column number (minus one), smear to the right, and then shift
+     #  back down. This will turn straight lines into the diagonals
+     #  that we want.
 
-     cnt_from_r <- t(apply(apply(apply(curr_layout, 1, rev), 2, cummax), 2, rev)) # Smear LEFT
-     cnt_from_r <- cbind(cnt_from_r[,-1], rep(0, r)) # Shift values LEFT into a new matrix
+     cnt_from_lu <- rbind(matrix(0,r,c), curr_layout)
+     cnt_from_lu <- shift_diag_down(smear_right(shift_diag_up(cnt_from_lu)))[-1:-r,]
 
-     cnt_from_d <- apply(apply(apply(curr_layout, 2, rev), 2, cummax), 2, rev) # Smear 1s all the way UP
-     cnt_from_d <- rbind(cnt_from_d[-1,], rep(0, c)) # Shift values UP into a new matrix
+     cnt_from_ru <- rbind(curr_layout, matrix(0,r,c))
+     cnt_from_ru <- shift_diag_up(smear_left(shift_diag_down(cnt_from_ru)))[1:r,]
 
-     # Here's an example of how to do that shifting. Note that it creates a warning.
-     # Shift UP:
-     # a2 <- matrix(cnt_from_r, ncol = c, nrow = r + 1)[1:r, ]
-     # a2[col(a2) + row(a2) > r + 1] <- 0
+     cnt_from_rd <- rbind(matrix(0,r,c), curr_layout)
+     cnt_from_rd <- shift_diag_down(smear_left(shift_diag_up(cnt_from_rd)))[-1:-r,]
+
+     cnt_from_ld <- rbind(curr_layout, matrix(0,r,c))
+     cnt_from_ld <- shift_diag_up(smear_right(shift_diag_down(cnt_from_ld)))[1:r,]
 
      # Sum these up.
      neighbor_cnt <- cnt_from_l + cnt_from_r + cnt_from_u + cnt_from_d +
@@ -122,12 +151,18 @@ while (!all(curr_layout == prev_layout)) {
      # Logical subscripting makes this next part easy!
      #  If a seat's neighbor count is 0, it becomes full (1)
      next_layout[neighbor_cnt == 0] <- 1
-     #  If its neighbor count is 4+, it empties     (0)
-     next_layout[neighbor_cnt >= 4] <- 0
+     #  If its neighbor count is 5+, it empties     (0)
+     next_layout[neighbor_cnt >= 5] <- 0
      #  Otherwise, no change.
 
      # However! Nobody is allowed to sit on the floor. Mask it off.
      next_layout[floor == 1] <- 0
+
+     print("===========")
+     print("Current:")
+     print(curr_layout)
+     print("Neighbors:")
+     print(neighbor_cnt)
 
      prev_layout <- curr_layout
      curr_layout <- next_layout
