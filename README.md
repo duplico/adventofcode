@@ -22,3 +22,4 @@ problem in a different language.
 10. Groovy
 11. R
 12. Tcl
+13. Scala
