@@ -1,3 +1,5 @@
+library(caTools)
+
 lines <- scan("input.txt", character(), quote="")
 chars <- strsplit(lines, "")
 seats <- do.call(rbind, chars)
@@ -26,8 +28,13 @@ prev_layout <- matrix(2, r, c) # Create an invalid "previous" layout
 #  sitting (prev_layout), which is invalid for the first run so we'll always
 #  loop at least once.
 
+gif_storage = array(0, c(r,c,100))
+steps <- 0
+
 # So, we're off to see the wizard.
 while (!all(curr_layout == prev_layout)) {
+
+     steps <- steps+1
 
      # Ok, this next part is really fiddly. We're going to make 8 new matrices
      #  by shifting the values in curr_layout around: in each cardinal direction,
@@ -49,6 +56,9 @@ while (!all(curr_layout == prev_layout)) {
      neighbor_cnt <- cnt_from_l + cnt_from_r + cnt_from_u + cnt_from_d +
                     cnt_from_lu + cnt_from_ld + cnt_from_ru + cnt_from_rd
 
+     gif_storage[,,steps] <- neighbor_cnt
+     gif_storage[,,steps][floor == 1] <- 0
+
      # Use our current layout as the starting point for the next one:
      next_layout <- curr_layout
 
@@ -65,6 +75,10 @@ while (!all(curr_layout == prev_layout)) {
      prev_layout <- curr_layout
      curr_layout <- next_layout
 }
+
+
+gif_storage <- gif_storage[,,1:steps]/max(gif_storage)
+write.gif(gif_storage, "part1.gif", col="jet", delay=15)
 
 # How many butts are in seats once this thing stabilizes?
 print(sum(curr_layout==1))

@@ -1,3 +1,5 @@
+library(caTools)
+
 # Given a vector of seats, smear across the vector.
 visible <- function(x) {
      # It assumes the values in x are 1 for occupied, 0 for empty seat,
@@ -113,8 +115,13 @@ prev_layout <- matrix(2, r, c) # Create an invalid "previous" layout
 #  sitting (prev_layout), which is invalid for the first run so we'll always
 #  loop at least once.
 
+gif_storage = array(0, c(r,c,100))
+steps <- 0
+
 # So, we're off to see the wizard.
 while (!all(curr_layout == prev_layout)) {
+
+     steps <- steps+1
      # Ok, we're going to do something similar to part 1 here. For each
      #  cardinal direction, we need to produce a matrix where a 1 means
      #  there's an occupied cell in that direction. I'm going to call this
@@ -179,6 +186,9 @@ while (!all(curr_layout == prev_layout)) {
      neighbor_cnt <- cnt_from_l + cnt_from_r + cnt_from_u + cnt_from_d +
                     cnt_from_lu + cnt_from_ld + cnt_from_ru + cnt_from_rd
 
+     gif_storage[,,steps] <- neighbor_cnt
+     gif_storage[,,steps][floor == 1] <- 0
+
      # Use our current layout as the starting point for the next one:
      next_layout <- curr_layout
 
@@ -196,6 +206,9 @@ while (!all(curr_layout == prev_layout)) {
      prev_layout <- curr_layout
      curr_layout <- next_layout
 }
+
+gif_storage <- gif_storage[,,1:steps]/max(gif_storage)
+write.gif(gif_storage, "part2.gif", col="jet", delay=10)
 
 # How many butts are in seats once this thing stabilizes?
 print(sum(curr_layout==1))
