@@ -1,52 +1,44 @@
-# this is an absolute mess.
-
+# Given a vector of seats, smear across the vector.
 visible <- function(x) {
-     # This function is used for smearing purposes.
      # It assumes the values in x are 1 for occupied, 0 for empty seat,
      #  and -1 for floor.
      # Smearing stops when it arrives at an unoccupied seat.
      
+     # We start at the edge of the boat, so nothing is visible in this
+     # direction:
      smearing <- 0
 
+     # For every seat in the vector:
      for (i in 1:length(x)) {
-          next_smearing <- smearing
           if (x[i] == 0) {
-               # Empty seat, stop smearing.
+               # Empty seat, which blocks our view; so will not smear
+               #  anything past it.
                next_smearing <- 0
           } else if (x[i] == 1) {
-               # Occupied occupied seat, smear from it.
+               # Occupied seat, smear from it (regardless of current
+               #  smearing status)
              next_smearing <- 1
-          } # Else it's the floor, which doesn't change our smearing status.
+          } else {
+               # Else it's the floor, which doesn't change our smearing status.
+               next_smearing <- smearing
+          }
 
           # Smear a 0 or 1 to the current element.
           x[i] <- smearing
+
           smearing <- next_smearing
      }
      return(x)
 } # visible
 
-shift_diag_right <- function(mat) {
-     nr <- nrow(mat)
-     nc <- ncol(mat)
 
-     for( i in 2:nr ){
-          mat[i,] <- c(rep(0,i-1), head(mat[i,], nc+1-i))
-     }
-
-     return(mat)
-}
-
-shift_diag_left <- function(mat) {
-     nr <- nrow(mat)
-     nc <- ncol(mat)
-
-     for( i in 2:nr ){
-          mat[i,] <- c(tail(mat[i,], nc+1-i), rep(0,i-1))
-     }
-
-     return(mat)
-}
-
+# These functions do a column-wise shift up or down on a matrix.
+#  Every column is shifted by (col_num-1) rows. So,
+#  The first column is not shifted. The second column is shifted
+#  up or down by 1 row, the third by 2, and so on. This has the
+#  effect of transforming a matrix that represents rectangular
+#  relationships between seats into one that represents diagonal
+#  relationships.
 shift_diag_down <- function(mat) {
      nr <- nrow(mat)
      nc <- ncol(mat)
@@ -57,7 +49,6 @@ shift_diag_down <- function(mat) {
 
      return(mat)
 }
-
 shift_diag_up <- function(mat) {
      nr <- nrow(mat)
      nc <- ncol(mat)
@@ -69,34 +60,29 @@ shift_diag_up <- function(mat) {
      return(mat)
 }
 
+# These helper functions accomplish what I'm calling "smearing," with a series
+#  of gross-looking matrix operations, which boil down to applying the
+#  `visible` function row-wise or column-wise. For everything but top-down
+#  column-wise, this requires us to apply and then reverse a series of
+#  reversing and transposition actions.
 smear_right <- function(mat) {
-
-     mat <- t(apply(mat, 1, visible)) # Smear any 1s we find all the way RIGHT
-     # mat <- cbind(rep(0, r), mat[,-ncol(mat)]) # Shift values RIGHT into a new matrix
-
-     return(mat)
+     t(apply(mat, 1, visible)) # Smear any 1s we find all the way RIGHT
 }
-
 smear_left <- function(mat) {
-     mat <- t(apply(apply(apply(mat, 1, rev), 2, visible), 2, rev)) # Smear LEFT
-     # mat <- cbind(mat[,-1], rep(0, nrow(mat))) # Shift values LEFT into a new matrix
-
-     return(mat)
+     t(apply(apply(apply(mat, 1, rev), 2, visible), 2, rev)) # Smear LEFT
 }
-
 smear_up <- function(mat) {
-     mat <- apply(apply(apply(mat, 2, rev), 2, visible), 2, rev) # Smear 1s all the way UP
-     # mat <- rbind(mat[-1,], rep(0, ncol(mat))) # Shift values UP into a new matrix
-     return(mat)
+     apply(apply(apply(mat, 2, rev), 2, visible), 2, rev)
 }
-
 smear_down <- function(mat) {
-     mat <- apply(mat, 2, visible) # Smear any 1s we find all the way DOWN
-     # mat <- rbind(rep(0, ncol(mat)), mat[-nrow(mat),]) # Shift values DOWN into a new matrix
-     return(mat)
+     apply(mat, 2, visible) # Smear any 1s we find all the way DOWN
 }
 
-lines <- scan("sample_input.txt", character(), quote="")
+###############
+# Here begins the program logic,
+#  which really should be in a procedure. Oh well.
+
+lines <- scan("input.txt", character(), quote="")
 chars <- strsplit(lines, "")
 seats <- do.call(rbind, chars)
 
@@ -106,7 +92,8 @@ c <- ncol(seats)
 
 # Now we're playing a WEIRD game of Life, where adjacency is defined VERY
 #  differently. The neighbor count is based on whether there are ANY 1s
-#  at all in each cardinal direction, and in diagonal directions.
+#  visible in each cardinal direction, and in diagonal directions,
+#  except that our "visibility" may be blocked by an empty seat.
 # Then, we use these rules:
 #  If its neighbor count is 0, it becomes full (1)
 #  If its neighbor count is 5+, it empties     (0)
@@ -128,49 +115,53 @@ prev_layout <- matrix(2, r, c) # Create an invalid "previous" layout
 
 # So, we're off to see the wizard.
 while (!all(curr_layout == prev_layout)) {
-
      # Ok, we're going to do something similar to part 1 here. For each
      #  cardinal direction, we need to produce a matrix where a 1 means
      #  there's an occupied cell in that direction. I'm going to call this
-     #  "smearing" because we're basically looking for the first 1 and
-     #  then putting that 1 everywhere after it.
+     #  "smearing" because we're looking for 1s and then smearing them in
+     #  some direction until we find an empty seat to mark with it.
 
-     # First, we need to accomplish the smearing task. This is done with a series
-     #  of gross-looking matrix operations, which boil down to applying the
-     #  `visible` function row-wise or column-wise. For everything but top-down
-     #  column-wise, this requires us to apply and then reverse a series of
-     #  reversing and transposition actions.
-
-     # We also need to keep our SHIFTING behavior, because this approach
-     #  incorrectly counts each seat as visible to itself.
-
-     # Annotate the floor with a -1 so smearing will work.
+     # Annotate the floor with a -1. Our smearing visibility function depends
+     #  upon the following key:
+     #  Empty seat = 0
+     #  Full seat = 1
+     #  Floor = -1
      curr_layout[floor == 1] <- -1
-     
-     print("===========")
-     print("Current:")
-     print(curr_layout)
 
+     # Cardinal directions.
      cnt_from_u <- smear_down(curr_layout)
      cnt_from_l <- smear_right(curr_layout)
      cnt_from_r <- smear_left(curr_layout)
      cnt_from_d <- smear_up(curr_layout)
-     
-     print("down")
-     print(cnt_from_u)
-     print("right")
-     print(cnt_from_l)
-     print("left")
-     print(cnt_from_r)
-     print("up")
-     print(cnt_from_d)
 
-     # Now, it's time for the diagonal ones. These are a little complicated,
-     #  but work by shifting, smearing, and unshifting. For example, to smear
-     #  diagonally down and to the right, we must shift every column up by
-     #  its column number (minus one), smear to the right, and then shift
-     #  back down. This will turn straight lines into the diagonals
-     #  that we want.
+     # Now, it's time for the diagonal ones. These are a little complicated.
+     #  We solve these by transforming the matrix: we double its vertical size,
+     #  then shift each column up or down according to its index. In this
+     #  transformed matrix, a left/right or up/down relationship between
+     #  entries corresponds to a DIAGONAL relationship in the source matrix.
+     # After the transformation, we apply a horizontal smearing function to
+     #  the matrix.
+     # Then, we reverse the diagonal transformation and trim off the excess
+     #  rows.
+     #
+     # For example, take the following grid, and assume we wish to smear
+     #  diagonally down and to the right to achieve the Goal grid:
+     #
+     # Original     Goal
+     # 111          000
+     # 000          011
+     # 001          001
+     #
+     # To achieve this, we expand it vertically and shift each column but
+     #  the first up according to its position; then we smear to the right,
+     #  then reverse the shift:
+     #
+     # Shifted      Smeared        Unshifted and truncated
+     # 001          000            000
+     # 010          001            011
+     # 101          011            001
+     # 000          000
+     # 000          000
 
      cnt_from_lu <- rbind(matrix(0,r,c), curr_layout)
      cnt_from_lu <- shift_diag_down(smear_right(shift_diag_up(cnt_from_lu)))[-1:-r,]
@@ -201,9 +192,6 @@ while (!all(curr_layout == prev_layout)) {
      # However! Nobody is allowed to sit on the floor. Mask it off.
      next_layout[floor == 1] <- 0
      curr_layout[floor == 1] <- 0 # Clean up our -1s
-
-     print("Neighbors:")
-     print(neighbor_cnt)
 
      prev_layout <- curr_layout
      curr_layout <- next_layout
