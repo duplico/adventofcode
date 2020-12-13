@@ -1,3 +1,30 @@
+# this is an absolute mess.
+
+visible <- function(x) {
+     # This function is used for smearing purposes.
+     # It assumes the values in x are 1 for occupied, 0 for empty seat,
+     #  and -1 for floor.
+     # Smearing stops when it arrives at an unoccupied seat.
+     
+     smearing <- 0
+
+     for (i in 1:length(x)) {
+          next_smearing <- smearing
+          if (x[i] == 0) {
+               # Empty seat, stop smearing.
+               next_smearing <- 0
+          } else if (x[i] == 1) {
+               # Occupied occupied seat, smear from it.
+             next_smearing <- 1
+          } # Else it's the floor, which doesn't change our smearing status.
+
+          # Smear a 0 or 1 to the current element.
+          x[i] <- smearing
+          smearing <- next_smearing
+     }
+     return(x)
+} # visible
+
 shift_diag_right <- function(mat) {
      nr <- nrow(mat)
      nc <- ncol(mat)
@@ -44,28 +71,28 @@ shift_diag_up <- function(mat) {
 
 smear_right <- function(mat) {
 
-     mat <- t(apply(mat, 1, cummax)) # Smear any 1s we find all the way RIGHT
-     mat <- cbind(rep(0, r), mat[,-ncol(mat)]) # Shift values RIGHT into a new matrix
+     mat <- t(apply(mat, 1, visible)) # Smear any 1s we find all the way RIGHT
+     # mat <- cbind(rep(0, r), mat[,-ncol(mat)]) # Shift values RIGHT into a new matrix
 
      return(mat)
 }
 
 smear_left <- function(mat) {
-     mat <- t(apply(apply(apply(mat, 1, rev), 2, cummax), 2, rev)) # Smear LEFT
-     mat <- cbind(mat[,-1], rep(0, nrow(mat))) # Shift values LEFT into a new matrix
+     mat <- t(apply(apply(apply(mat, 1, rev), 2, visible), 2, rev)) # Smear LEFT
+     # mat <- cbind(mat[,-1], rep(0, nrow(mat))) # Shift values LEFT into a new matrix
 
      return(mat)
 }
 
 smear_up <- function(mat) {
-     mat <- apply(apply(apply(mat, 2, rev), 2, cummax), 2, rev) # Smear 1s all the way UP
-     mat <- rbind(mat[-1,], rep(0, ncol(mat))) # Shift values UP into a new matrix
+     mat <- apply(apply(apply(mat, 2, rev), 2, visible), 2, rev) # Smear 1s all the way UP
+     # mat <- rbind(mat[-1,], rep(0, ncol(mat))) # Shift values UP into a new matrix
      return(mat)
 }
 
 smear_down <- function(mat) {
-     mat <- apply(mat, 2, cummax) # Smear any 1s we find all the way DOWN
-     mat <- rbind(rep(0, ncol(mat)), mat[-nrow(mat),]) # Shift values DOWN into a new matrix
+     mat <- apply(mat, 2, visible) # Smear any 1s we find all the way DOWN
+     # mat <- rbind(rep(0, ncol(mat)), mat[-nrow(mat),]) # Shift values DOWN into a new matrix
      return(mat)
 }
 
@@ -110,17 +137,33 @@ while (!all(curr_layout == prev_layout)) {
 
      # First, we need to accomplish the smearing task. This is done with a series
      #  of gross-looking matrix operations, which boil down to applying the
-     #  `cummax` function row-wise or column-wise. For everything but top-down
+     #  `visible` function row-wise or column-wise. For everything but top-down
      #  column-wise, this requires us to apply and then reverse a series of
      #  reversing and transposition actions.
 
      # We also need to keep our SHIFTING behavior, because this approach
      #  incorrectly counts each seat as visible to itself.
 
+     # Annotate the floor with a -1 so smearing will work.
+     curr_layout[floor == 1] <- -1
+     
+     print("===========")
+     print("Current:")
+     print(curr_layout)
+
      cnt_from_u <- smear_down(curr_layout)
      cnt_from_l <- smear_right(curr_layout)
      cnt_from_r <- smear_left(curr_layout)
      cnt_from_d <- smear_up(curr_layout)
+     
+     print("down")
+     print(cnt_from_u)
+     print("right")
+     print(cnt_from_l)
+     print("left")
+     print(cnt_from_r)
+     print("up")
+     print(cnt_from_d)
 
      # Now, it's time for the diagonal ones. These are a little complicated,
      #  but work by shifting, smearing, and unshifting. For example, to smear
@@ -157,10 +200,8 @@ while (!all(curr_layout == prev_layout)) {
 
      # However! Nobody is allowed to sit on the floor. Mask it off.
      next_layout[floor == 1] <- 0
+     curr_layout[floor == 1] <- 0 # Clean up our -1s
 
-     print("===========")
-     print("Current:")
-     print(curr_layout)
      print("Neighbors:")
      print(neighbor_cnt)
 
