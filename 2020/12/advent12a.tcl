@@ -6,13 +6,11 @@ proc open_file {input_file} {
 }
 
 proc advent12a {input_file} {
-     puts $input_file
-
      set instructions [open_file $input_file]
 
      # We will describe our starting location as (0,0).
-     set x 0
-     set y 0
+     set x 0; # East is positive.
+     set y 0; # North is positive.
 
      # Our boat or whatever starts facing East. We'll call that 0.
      # And we'll measure the direction we're pointing as clockwise degrees,
@@ -29,7 +27,6 @@ proc advent12a {input_file} {
           set num [string range $instruction 1 end]
 
           if { $instruction == "" } {
-               puts skip
                continue
           }
 
@@ -41,15 +38,20 @@ proc advent12a {input_file} {
                L { set heading [expr ($heading + 360 - $num) % 360] }
                R { set heading [expr ($heading + $num) % 360] }
                F {
-                    puts "Forward $num"
+                    switch $heading {
+                         0    { set x [expr $x + $num] }
+                         90   { set y [expr $y - $num] }
+                         180  { set x [expr $x - $num] }
+                         270  { set y [expr $y + $num] }
+                    }
                }
-
-
           }
-
      }
-}
+     
+     set manhattan_distance [expr abs($x) + abs($y)]
 
+     puts "Manhattan distance from start: $manhattan_distance"
+}
 
 if { $argc == 1 } {
      set input_file [lindex $argv 0]
