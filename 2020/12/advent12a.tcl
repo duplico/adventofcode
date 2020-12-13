@@ -31,18 +31,18 @@ proc advent12a {input_file} {
           }
 
           switch $op {
-               N { set y [expr $y + $num] }
-               S { set y [expr $y - $num] }
-               E { set x [expr $x + $num] }
-               W { set x [expr $x - $num] }
+               N { incr y $num }
+               S { incr y -$num }
+               E { incr x $num }
+               W { incr x -$num }
                L { set heading [expr ($heading + 360 - $num) % 360] }
                R { set heading [expr ($heading + $num) % 360] }
                F {
                     switch $heading {
-                         0    { set x [expr $x + $num] }
-                         90   { set y [expr $y - $num] }
-                         180  { set x [expr $x - $num] }
-                         270  { set y [expr $y + $num] }
+                         0    { incr x $num }
+                         90   { incr y -$num }
+                         180  { incr x -$num }
+                         270  { incr y $num }
                     }
                }
           }
