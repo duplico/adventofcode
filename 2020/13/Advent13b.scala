@@ -16,8 +16,6 @@ object Bus {
      var lastBusIndex = 0
 }
 
-
-
 object Advent13b extends App {
 
      def syncBuses(bus0 : Bus, bus1 : Bus) : Boolean = {
