@@ -21,21 +21,22 @@ object Advent13b extends App {
      def syncBuses(bus0 : Bus, bus1 : Bus) : Boolean = {
           var targetVal : Long = 0L
           var workToDo = false
-          while (bus0.departure + bus1.fromLast != bus1.departure) {
+          var indexDiff = bus1.index - bus0.index
+          while (bus0.departure + indexDiff != bus1.departure) {
                workToDo = true
                // println("Working on:")
                // println(" " + bus0 + " " + bus1)
-               if (bus0.departure + bus1.fromLast < bus1.departure) {
+               if (bus0.departure + indexDiff < bus1.departure) {
                     // bus0 is too low:
                     // bus0 needs to be advanced to be equal to or greater than
-                    //  bus1.departure-bus1.fromLast.
-                    targetVal = bus1.departure-bus1.fromLast
+                    //  bus1.departure-indexDiff.
+                    targetVal = bus1.departure-indexDiff
                     bus0.departure = (targetVal / bus0.interval) * bus0.interval
                     if (bus0.departure < targetVal) bus0.departure += bus0.interval
                } else {
                     // bus1 is too low:
-                    // It needs to be at least bus0.departure+bus1.fromLast
-                    targetVal = bus0.departure+bus1.fromLast
+                    // It needs to be at least bus0.departure+indexDiff
+                    targetVal = bus0.departure+indexDiff
                     bus1.departure = (targetVal / bus1.interval) * bus1.interval
                     if (bus1.departure < targetVal) bus1.departure += bus1.interval
                }
@@ -43,6 +44,7 @@ object Advent13b extends App {
                // println(" " + bus0 + " " + bus1)
           }
 
+          // if (workToDo) bus0.departure + indexDiff != bus1.departure else false
           workToDo
      }
 
@@ -74,11 +76,13 @@ object Advent13b extends App {
      var workToDo = true
      var iterations = 0L
 
+     syncBuses(buses(0), buses(0))
+
      while (workToDo) {
           workToDo = false
           for (i <- Range(0, buses.length-1)) {
                // syncBuses returns true if there was work to do.
-               if (syncBuses(buses(i), buses(i+1))) {
+               if (syncBuses(buses(0), buses(i+1))) {
                     workToDo = true
                }
           }
