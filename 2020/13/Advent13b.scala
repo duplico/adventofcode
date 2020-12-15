@@ -1,11 +1,17 @@
 import scala.io.Source
 import scala.collection.mutable.ArrayBuffer
 
-class Bus(val interval : Long, val index : Long) {
+class Bus(val interval : Long, val index : Long, val dontfix : Boolean = false) {
+     var a = (interval-index) % interval // Remainder
+     val n = interval
+     if (a < 0) a = interval+a
+
+     // Ugh, this is really ugly:
+     if (dontfix) a = index
 
      // Overriding tostring method 
     override def toString() : String = { 
-        "[..." + index + " " + interval + "]"
+        "[..." + a + " " + interval + "]"
     } 
 }
 
@@ -39,6 +45,8 @@ object Advent13b extends App {
                old_t = tmp
           }
           
+          println(s"Extended Euclidean of ${(a, b)} -> Bezout coeffs ${(old_s, old_t)} for gcf $old_r")
+
           // After that loop, the Bezout coefficients are old_s, old_t
           (old_s, old_t)
      }
@@ -49,17 +57,22 @@ object Advent13b extends App {
                println("Got unexpected buses length 1")
                sys.exit(1)
           } else if (buses.size == 2) {
+               // TODO:
                // Base case: index = remainder = a; interval = divisor = n
-               val (m0, m1) = euclidean_ex(buses(0).interval, buses(1).interval)
-               val soln = (m1 * buses(0).index * buses(1).interval + m0 * buses(1).index * buses(0).interval) % (buses(0).interval * buses(1).interval)
-               if (soln < 0)
-                    buses(0).interval*buses(1).interval + soln
+               println(s"Base case: ${buses(0)} and ${buses(1)}")
+               val (m0, m1) = euclidean_ex(buses(0).n, buses(1).n)
+               var soln = (m1 * buses(0).a * buses(1).n + m0 * buses(1).a * buses(0).n) % (buses(0).n*buses(1).n)
+               println(s"$m1 * ${buses(0).a} * ${buses(1).n} + $m0 * ${buses(1).a} * ${buses(0).n} = $soln (mod ${buses(0).n*buses(1).n})")
+               if (soln < 0) {
+                    println(s"Fixing to ${buses(0).n*buses(1).n + soln}")
+                    buses(0).n*buses(1).n + soln
+               }
                else
                     soln
           } else {
                // General case
                // val soln = crt_solve(buses(0), buses(1))
-               crt_solve(List(new Bus(buses(0).interval*buses(1).interval, crt_solve(buses.slice(0,2): _*))) ++ buses.slice(2,buses.size): _*)
+               crt_solve(List(new Bus(buses(0).n*buses(1).n, crt_solve(buses(0), buses(1)), true)) ++ buses.slice(2,buses.size): _*)
           }
      }
 
