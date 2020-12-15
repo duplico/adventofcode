@@ -94,15 +94,10 @@ object Advent13b extends App {
      val lines = f.getLines()
 
      lines.next() // Throw away the first line.
-
-     var busIndex = 0
-     var buses = new ArrayBuffer[Bus]()
-     for (bus <- lines.next().split(",")) {
-          if (bus != "x") {
-               buses += new Bus(bus.toInt, busIndex)
-          }
-          busIndex += 1
-     }
+     
+     var buses =
+          for (bus <- lines.next().split(",").zipWithIndex if bus._1 != "x")
+          yield new Bus(bus._1.toInt, bus._2)
 
      f.close()
 
@@ -110,5 +105,5 @@ object Advent13b extends App {
 
      println("Initial input " + buses)
 
-     println(s"Soln: 0..$cnt " + crt_solve(buses.toList.slice(0,cnt): _*))
+     println(s"Soln: 0..$cnt " + crt_solve(buses.slice(0,cnt): _*))
 }
