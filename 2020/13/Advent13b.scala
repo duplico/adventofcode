@@ -1,7 +1,7 @@
 import scala.io.Source
 import scala.collection.mutable.ArrayBuffer
 
-class Bus(val interval : Long, val index : Long, val dontfix : Boolean = false) {
+class Bus(val interval : BigInt, val index : BigInt, val dontfix : Boolean = false) {
      var a = (interval-index) % interval // Remainder
      val n = interval
      if (a < 0) a = interval+a
@@ -17,14 +17,14 @@ class Bus(val interval : Long, val index : Long, val dontfix : Boolean = false) 
 
 object Advent13b extends App {
 
-     def euclidean_ex(a : Long, b : Long) : (Long, Long) = {
+     def euclidean_ex(a : BigInt, b : BigInt) : (BigInt, BigInt) = {
           // as + bt = gcd(a, b)
           // In this case, we'll know gcd=1
           var (old_r, r) = (a, b)
-          var (old_s, s) = (1L, 0L)
-          var (old_t, t) = (0L, 1L)
-          var quotient : Long = 0L
-          var tmp : Long = 0L
+          var (old_s, s) = (BigInt(1L), BigInt(0L))
+          var (old_t, t) = (BigInt(0L), BigInt(1L))
+          var quotient : BigInt = 0L
+          var tmp : BigInt = 0L
 
           while (r != 0) {
                quotient = old_r / r
@@ -51,7 +51,7 @@ object Advent13b extends App {
           (old_s, old_t)
      }
 
-     def crt_solve(buses : Bus*) : Long = {
+     def crt_solve(buses : Bus*) : BigInt = {
           if (buses.size == 1) {
                // This is an error.
                println("Got unexpected buses length 1")
@@ -77,11 +77,16 @@ object Advent13b extends App {
      }
 
      var filename : String = "sample_input.txt"
-     if (args.length > 1) {
-          println("Expected: Advent13a [input.txt]")
+     var cnt : Int = 0
+
+     if (args.length > 2) {
+          println("Expected: Advent13a [input.txt] [cnt]")
           sys.exit(1)
      } else if (args.length == 1) {
           filename = args(0)
+     } else if (args.length == 2) {
+          filename = args(0)
+          cnt = args(1).toInt
      }
      
      val f = scala.io.Source.fromFile(filename)
@@ -100,11 +105,12 @@ object Advent13b extends App {
 
      f.close()
 
-
+     if (cnt == 0) cnt = buses.size
 
      println("Initial input " + buses)
 
-     println("Soln: " + crt_solve(buses.toList: _*))
+     println(s"Soln: 0..$cnt " + crt_solve(buses.toList.slice(0,cnt): _*))
+
      // println(euclidean(7,13))
      // println(euclidean(0*13,1*7))
 
