@@ -3,7 +3,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class Bus(val interval : BigInt, val index : BigInt, val dontfix : Boolean = false) {
      var a = (interval-index) % interval // Remainder
-     val n = interval
+     val n = interval // Divisor
      if (a < 0) a = interval+a
 
      // Ugh, this is really ugly:
@@ -16,7 +16,7 @@ class Bus(val interval : BigInt, val index : BigInt, val dontfix : Boolean = fal
 }
 
 object Advent13b extends App {
-
+     /// Apply the extended Euclidean algorithmand return Bezout coefficients.
      def euclidean_ex(a : BigInt, b : BigInt) : (BigInt, BigInt) = {
           // as + bt = gcd(a, b)
           // In this case, we'll know gcd=1
@@ -51,13 +51,13 @@ object Advent13b extends App {
           (old_s, old_t)
      }
 
+     /// Recursively find a solution using the Chinese Remainder Theorem.
      def crt_solve(buses : Bus*) : BigInt = {
           if (buses.size == 1) {
                // This is an error.
                println("Got unexpected buses length 1")
                sys.exit(1)
           } else if (buses.size == 2) {
-               // TODO:
                // Base case: index = remainder = a; interval = divisor = n
                println(s"Base case: ${buses(0)} and ${buses(1)}")
                val (m0, m1) = euclidean_ex(buses(0).n, buses(1).n)
@@ -71,11 +71,12 @@ object Advent13b extends App {
                     soln
           } else {
                // General case
-               // val soln = crt_solve(buses(0), buses(1))
                crt_solve(List(new Bus(buses(0).n*buses(1).n, crt_solve(buses(0), buses(1)), true)) ++ buses.slice(2,buses.size): _*)
           }
      }
 
+
+     // Parse some arguments.
      var filename : String = "sample_input.txt"
      var cnt : Int = 0
 
@@ -110,10 +111,4 @@ object Advent13b extends App {
      println("Initial input " + buses)
 
      println(s"Soln: 0..$cnt " + crt_solve(buses.toList.slice(0,cnt): _*))
-
-     // println(euclidean(7,13))
-     // println(euclidean(0*13,1*7))
-
-     // println(euclidean_ex(7,13))
-     // println(euclidean_ex(0*13,1*7))
 }
