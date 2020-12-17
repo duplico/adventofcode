@@ -24,3 +24,4 @@ problem in a different language.
 12. Tcl
 13. Scala
 14. Go
+15. Ruby
