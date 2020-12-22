@@ -50,12 +50,6 @@ function sieveTicket(line) {
                // Examine this field for the remaining possibilities:
                let field = fieldPossibilities[i][j];
                if (!fieldValid(field, val)) {
-                    if (i == 19) {
-                         console.log("Considering index " + j + " of: ");
-                         console.log(fieldPossibilities[i]);
-                         console.log(line);
-                         console.log("Invalid field " + field.fieldname + ": " + val);
-                    }
                     fieldPossibilities[i].splice(j,1);
                }
           }
@@ -63,7 +57,6 @@ function sieveTicket(line) {
 }
 
 function removeAmbiguous(fieldChoices) {
-     console.log(fieldChoices);
      if (fieldChoices.every(c => c.length == 1)) {
           return fieldChoices.flat();
      }
@@ -105,7 +98,6 @@ async function main(filepath) {
      });
 
      let phase = 0
-     let errorCount = 0
      let mySeat;
 
      for await (const line of readInterface) {
@@ -145,7 +137,15 @@ async function main(filepath) {
      fieldPossibilities = fieldPossibilities.map(a => a.map(b => b.fieldname));
      let fieldNames = removeAmbiguous(fieldPossibilities);
 
+     let departureCount = 1;
 
+     for (let i=0; i<fieldNames.length; i++) {
+          if (fieldNames[i].startsWith("departure")) {
+               departureCount *= mySeat[i];
+          }
+     }
+
+     console.log(departureCount);
 }
 
 if (require.main === module) {
