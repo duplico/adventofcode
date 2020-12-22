@@ -26,3 +26,5 @@ problem in a different language.
 14. Go
 15. Ruby
 16. Javascript
+17. Rust
+18. PHP
