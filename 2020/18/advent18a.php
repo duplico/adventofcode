@@ -1,13 +1,9 @@
 <?php
 
 function do_math($a1, $op, $a2) {
-     echo "DO MATH: " . $a1 . $op . $a2 . " = ";
-
      if ($op == '+') {
-          echo intval($a1) + intval($a2) . "\n";
           return $a1 + $a2;
      } else if ($op === "*") {
-          echo intval($a1) * intval($a2) . "\n";
           return $a1 * $a2;
      } else {
           echo "ERROR!!!! INVALID OPERATOR!\n";
@@ -26,13 +22,10 @@ function eval_adventmath($line) {
      if ($first_paren === false) {
           // Base-ish case: there are no parens, so let's just do
           //  some math.
-          echo "BASE CASE: " . $line . "\n";
           $pc = 0;
           $val = intval($toks[0]);
           while ($pc+2 < count($toks)) {
-               // echo "Do math: " . $val . " " . $toks[$pc+1] . " " . intval($toks[$pc+2]) + "\n";
                $val = do_math($val, $toks[$pc+1], intval($toks[$pc+2]));
-               // echo "result " . $val . "\n";
                $pc += 2;
           }
           return $val;
@@ -59,4 +52,11 @@ function eval_adventmath($line) {
      }
 }
 
-echo eval_adventmath("1 + (2 * 3) + (4 * (5 + 6))") . "\n";
+$file = fopen("input.txt", "r");
+$line = "";
+$sum = 0;
+while (!feof($file)) {
+     $sum += eval_adventmath(fgets($file));
+}
+
+echo $sum . "\n";
