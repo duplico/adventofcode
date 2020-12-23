@@ -13,14 +13,17 @@ function do_math($a1, $op, $a2) {
 
 function tokenize_str($line) {     
      $pattern = "/\+|\*|\d+|\(|\)/";
-     preg_match_all($pattern, "1 + (22 * 3) + (4 * (5 + 6))", $toks);
-     return $toks;
+     preg_match_all($pattern, $line, $toks);
+     return $toks[0];
 }
 
 function eval_adventmath($toks) {
      $first_paren = array_search("(", $toks);
      $first_add = array_search("+", $toks);
-     if ($first_paren === false && $first_add === false) {
+     if (count($toks) == 1) {
+          // we have a single value!
+          return intval($toks[0]);
+     } else if ($first_paren === false && $first_add === false) {
           // Base-ish case: there are no parens, and no adds, 
           // so let's just do some math.
           $pc = 0;
@@ -35,10 +38,8 @@ function eval_adventmath($toks) {
           // Find the first addition, resolve it, and recurse.
           // The first addition is $toks[$first_add-1] + $toks[$first_add+1].
           $new_val = do_math(intval($toks[$first_add-1]), "+", intval($toks[$first_add+1]));
-          $toks = array_splice($toks, $first_add-1, 3, $new_val);
-          $new_line = join(" ", $toks);
-          echo $new_line;
-          return eval_adventmath($new_line);
+          array_splice($toks, $first_add-1, 3, $new_val);
+          return eval_adventmath($toks);
      } else {
           // There are parens.
           // Find the first open paren, and its matching close paren, and
@@ -46,15 +47,15 @@ function eval_adventmath($toks) {
           $nesting_level = 1;
           $paren_len = 1;
           while (true) {
-               if (substr($line, $first_paren + $paren_len, 1) == '(') {
+               if ($toks[$first_paren + $paren_len] == '(') {
                     $nesting_level += 1;
-               } else if (substr($line, $first_paren + $paren_len, 1) == ')') {
+               } else if ($toks[$first_paren + $paren_len] == ')') {
                     $nesting_level -= 1;
                     if ($nesting_level == 0) {
                          // then we're going to extract and replace the
                          //  parenthetical at indices $first_paren..$last_paren
-                         $line = substr($line, 0, $first_paren) . eval_adventmath(substr($line, $first_paren+1, $paren_len-1)) . substr($line, $first_paren+$paren_len+1);
-                         return eval_adventmath($line);
+                         array_splice($toks, $first_paren, $paren_len+1, eval_adventmath(array_slice($toks, $first_paren+1, $paren_len-1)));
+                         return eval_adventmath($toks);
                     }
                }
                $paren_len++;
@@ -62,16 +63,10 @@ function eval_adventmath($toks) {
      }
 }
 
-// $file = fopen("input.txt", "r");
-// $line = "";
-// $sum = 0;
-// while (!feof($file)) {
-//      $sum += eval_adventmath(tokenize_str(fgets($file)));
-// }
-// 
-// $sum = eval_adventmath("1 + (2 * 3) + (4 * (5 + 6))");
-// echo $sum . "\n";
-
-var_dump(tokenize_str("1 + (22 * 3) + (4 * (5 + 6))"));
-
-echo eval_adventmath(tokenize_str("1+2"));
+$file = fopen("input.txt", "r");
+$line = "";
+$sum = 0;
+while (!feof($file)) {
+     $sum += eval_adventmath(tokenize_str(fgets($file)));
+}
+echo $sum . "\n";
