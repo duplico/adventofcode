@@ -1,5 +1,4 @@
 import fileinput
-from os.path import commonprefix
 import operator
 
 def filter_prefix(candidates: set[str], prefix: str = '', ones_operator=operator.ge) -> int:
