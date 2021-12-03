@@ -1,5 +1,4 @@
 import fileinput
-from operator import add
 
 def main():
     digit_totals = None
