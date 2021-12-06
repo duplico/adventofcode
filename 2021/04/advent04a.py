@@ -6,6 +6,7 @@ BINGO_DIMENSION = 5
 def main():
     bingo_cards = []
     for line in fileinput.input():
+        # The first line is the list of bingo numbers
         if fileinput.isfirstline():
             bingo_numbers = list(map(int, line.strip().split(',')))
         elif not line.strip(): # Blank line; new bingo card.
