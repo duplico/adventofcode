@@ -23,6 +23,11 @@ def main():
             max_y = max(y, max_y)
             dots.append((x,y))
     
+    # The dimensions must be odd (so maxes must be even):
+    if max_x % 2:
+        max_x +=1
+    if  max_y % 2:
+        max_y += 1
     # NB: This is going to render transposed from the figures on the website.
     dotfield = np.zeros((max_x+1, max_y+1), dtype=np.int0)
 
