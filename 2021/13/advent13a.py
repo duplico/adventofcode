@@ -19,15 +19,14 @@ def main():
             folds.append((direction, position))
         else:
             x, y = map(int, line.split(','))
-            max_x = max(x, max_x)
-            max_y = max(y, max_y)
             dots.append((x,y))
     
-    # The dimensions must be odd (so maxes must be even):
-    if max_x % 2:
-        max_x +=1
-    if  max_y % 2:
-        max_y += 1
+    for fold in folds:
+        if fold[0] == 'x':
+            max_x = max(max_x, fold[1]*2)
+        else:
+            max_y = max(max_y, fold[1]*2)
+
     # NB: This is going to render transposed from the figures on the website.
     dotfield = np.zeros((max_x+1, max_y+1), dtype=np.int0)
 
