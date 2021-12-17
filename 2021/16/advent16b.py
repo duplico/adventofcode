@@ -51,10 +51,7 @@ class BitsPacket:
     def _advance_window(self, msb_decr):
         self.msb_at -= msb_decr
 
-        
-        # *** TODO: Handle if we're on the last byte. (though my input works fine)
-
-        while len(self.hex) > 2 and self.msb_at < 8: # it's in the lower half of the word
+        while self.msb_at < 8: # it's in the lower half of the word
             self.msb_at += 8
             self.hex = self.hex[2:] # Chop off the fully used MSByte.
         # Update the current word:
@@ -115,7 +112,10 @@ class BitsPacket:
         return self._len
 
 def main():
-    hex_string = fileinput.input().readline().strip()
+    # We add 0x00-pads to the end to prevent overruns; because the
+    #  hexstring-to-binary conversion works on 16 bits at a time,
+    #  and because ending zero-pads are ignored, this is safe to do.
+    hex_string = fileinput.input().readline().strip() + '0000'
     print(BitsPacket(hex_string).value)
     pass
 

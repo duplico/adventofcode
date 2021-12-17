@@ -84,7 +84,10 @@ class BitsPacket:
         return self._len
 
 def main():
-    hex_string = fileinput.input().readline().strip()
+    # We add 0x00-pads to the end to prevent overruns; because the
+    #  hexstring-to-binary conversion works on 16 bits at a time,
+    #  and because ending zero-pads are ignored, this is safe to do.
+    hex_string = fileinput.input().readline().strip() + '0000'
     print(BitsPacket(hex_string).enclosed_version_total)
     pass
 
