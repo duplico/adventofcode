@@ -17,9 +17,7 @@ class BitsPacket:
         self.hex = hex_string
         self.current_word = int(self.hex[:4], base=16)
         self.msb_at = msb_at
-        # Zero out any unneeded more significant bits of the current word:
-        # TODO: Unneeded?:
-        # current_word = current_word & (0xffff >> (15-msb_at))
+        
         # bits msb..msb-3   -> version
         self.version = self._get_next_n_bits(3)
         # bits msb-3..msb-6 -> type
