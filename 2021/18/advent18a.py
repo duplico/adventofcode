@@ -1,12 +1,6 @@
 import fileinput
 import math
 
-class Split(Exception):
-     pass
-
-class Explode(Exception):
-     pass
-
 def sf_reduce(val):
      toks = val.copy()
      exploded = True
