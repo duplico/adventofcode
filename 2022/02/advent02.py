@@ -33,7 +33,23 @@ def part1(filename):
 
 
 def part2(filename):
-     pass
+     translation = dict(
+          A=ROCK, X=2,
+          B=PAPER, Y=0,
+          C=SCISSORS, Z=1
+     )
+
+     running_score = 0
+
+     for line in open(filename):
+          op_choice = translation[line[0]]
+          my_choice = op_choice + translation[line[2]]
+          if my_choice > 3:
+               my_choice -= 3
+          
+          running_score += my_choice + game_result_score(op_choice, my_choice)
+          
+     print(running_score)
 
 if __name__ == '__main__':
      if sys.argv[1] == '1':
