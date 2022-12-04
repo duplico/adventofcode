@@ -20,9 +20,21 @@ def part1(filename):
           priority_sum += priorities[shared.pop()]
      print(priority_sum)
 
-
 def part2(filename):
-     pass
+     priority_sum = 0
+     elf_number = 0
+     for line in open(filename):
+          line = line.strip()
+          if not elf_number:
+               shared = set(line)
+          else:
+               shared = shared.intersection(set(line))
+          
+          elf_number += 1
+          if elf_number == 3:
+               elf_number = 0
+               priority_sum += priorities[shared.pop()]
+     print(priority_sum)
 
 if __name__ == '__main__':
      setup()
