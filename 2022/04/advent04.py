@@ -13,7 +13,14 @@ def part1(filename):
      print(contained_count)
 
 def part2(filename):
-     pass
+     overlapping_count = 0
+     for line in open(filename):
+          start1,end1,start2,end2 = tuple(map(int, re.split('-|,', line.strip())))
+          section1 = set(range(start1, end1+1))
+          section2 = set(range(start2, end2+1))
+          if section1.intersection(section2):
+               overlapping_count += 1
+     print(overlapping_count)
 
 if __name__ == '__main__':
      setup()
