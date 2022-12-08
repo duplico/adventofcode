@@ -40,10 +40,7 @@ class ElfFile:
           
           return sz
 
-def setup():
-     pass
-
-def part1(filename):
+def setup(filename):
      root_dir = ElfFile(None, '/', True)
      current_dir = root_dir
      with open(filename) as f:
@@ -75,6 +72,7 @@ def part1(filename):
                     int(size) if size != 'dir' else 0
                )
 
+def part1(filename):
      small_dir_sizes = 0
      for dir in all_dirs:
           sz = dir.size()
@@ -87,7 +85,7 @@ def part2(filename):
      pass
 
 if __name__ == '__main__':
-     setup()
+     setup(sys.argv[2])
      if sys.argv[1] == '1':
           part1(sys.argv[2])
      else:
