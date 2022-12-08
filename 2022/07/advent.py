@@ -41,6 +41,7 @@ class ElfFile:
           return sz
 
 def setup(filename):
+     global root_dir
      root_dir = ElfFile(None, '/', True)
      current_dir = root_dir
      with open(filename) as f:
@@ -82,7 +83,18 @@ def part1(filename):
      print(small_dir_sizes)
 
 def part2(filename):
-     pass
+     TOTAL_SPACE = 70000000
+     FREE_SPACE = TOTAL_SPACE - root_dir.size()
+     NEEDED_SPACE = 30000000 - FREE_SPACE
+     
+     dir_size = TOTAL_SPACE
+
+     for dir in all_dirs:
+          sz = dir.size()
+          if sz > NEEDED_SPACE and sz < dir_size:
+               dir_size = sz
+     
+     print(dir_size)
 
 if __name__ == '__main__':
      setup(sys.argv[2])
