@@ -6,7 +6,7 @@ Point = namedtuple('Point', ['x', 'y'])
 def setup():
      pass
 
-def next_point1(head, tail):
+def next_point(head, tail):
      x = tail.x
      y = tail.y
 
@@ -45,14 +45,36 @@ def part1(filename):
                     head = head._replace(y=head.y+1)
                elif dir == 'D':
                     head = head._replace(y=head.y-1)
-               tail = next_point1(head, tail)
+               tail = next_point(head, tail)
                visited_points.add(tail)
      
      print(len(visited_points))
 
 
 def part2(filename):
-     pass
+     knots = [Point(0, 0)] * 10
+     visited_points = set([knots[-1]])
+     
+     for line in open(filename):
+          dir, dist = line.strip().split()
+          dist = int(dist)
+
+          for _ in range(dist):
+               if dir == 'R':
+                    knots[0] = knots[0]._replace(x=knots[0].x+1)
+               elif dir == 'L':
+                    knots[0] = knots[0]._replace(x=knots[0].x-1)
+               elif dir == 'U':
+                    knots[0] = knots[0]._replace(y=knots[0].y+1)
+               elif dir == 'D':
+                    knots[0] = knots[0]._replace(y=knots[0].y-1)
+
+               for k in range(1,len(knots)):
+                    knots[k] = next_point(knots[k-1], knots[k])
+
+               visited_points.add(knots[-1])
+     
+     print(len(visited_points))
 
 if __name__ == '__main__':
      setup()
