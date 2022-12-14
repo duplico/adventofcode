@@ -3,17 +3,6 @@ import sys
 def setup():
      pass
 
-def trees_in_range(trees, outer_range, inner_range):
-     visible_trees = 0
-
-     for row in range(len(trees)):
-          tallest = 0
-          for col in range(len(row)):
-               if trees[row][col] >= tallest:
-                    tallest = trees[row][col]
-                    visible_tress += 1
-     return visible_trees
-
 def part1(filename):
      trees = []
      for line in open(filename):
