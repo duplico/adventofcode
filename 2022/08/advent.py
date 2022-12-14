@@ -44,9 +44,64 @@ def part1(filename):
                     
      print(len(visible_tress))
 
+def pos_val(trees, row, col):
+     val = 1
+
+     # Look left
+     v = 0
+     c = col
+     while c > 0:
+          c -= 1
+          v += 1
+          if trees[row][c] >= trees[row][col]:
+               break
+     val *= v
+     
+     # Look right
+     v = 0
+     c = col
+     while c < len(trees[0]) - 1:
+          c += 1
+          v += 1
+          if trees[row][c] >= trees[row][col]:
+               break
+     val *= v
+
+     # Look up
+     v = 0
+     r = row
+     while r > 0:
+          r -= 1
+          v += 1
+          if trees[r][col] >= trees[row][col]:
+               break
+     val *= v
+
+     # Look down
+     v = 0
+     r = row
+     while r < len(trees) - 1:
+          r += 1
+          v += 1
+          if trees[r][col] >= trees[row][col]:
+               break
+     val *= v
+
+     return val
 
 def part2(filename):
-     pass
+     trees = []
+     for line in open(filename):
+          trees.append(line.strip())
+     
+     best_score = 0
+     for r in range(len(trees)):
+          for c in range(len(trees[r])):
+               v = pos_val(trees, r, c)
+               if v > best_score:
+                    best_score = v
+     
+     print(best_score)
 
 if __name__ == '__main__':
      setup()
