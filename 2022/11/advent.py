@@ -27,7 +27,7 @@ class Monkey():
      def __post_init__(self):
           Monkey.all_monkeys[self.num] = self
 
-     def take_turn(self, debug=False):
+     def take_turn(self, debug=False, div_by_3=True):
           assert self.true_dest != self.num
           assert self.false_dest != self.num
 
@@ -46,10 +46,11 @@ class Monkey():
                                                                item if self.operand == -1 else self.operand,
                                                                worry_level))
 
-               # Monkey gets bored with item. Worry level is divided by 3.
-               worry_level = worry_level // 3
-               if debug:
-                    print('  Monkey gets bored with item. Worry level is divided by 3 to %d' % worry_level)
+               if div_by_3:
+                    # Monkey gets bored with item. Worry level is divided by 3.
+                    worry_level = worry_level // 3
+                    if debug:
+                         print('  Monkey gets bored with item. Worry level is divided by 3 to %d' % worry_level)
 
                # Test worry level against self.divisor:
                if worry_level % self.divisor == 0:
@@ -63,10 +64,7 @@ class Monkey():
 
           self.items = []
 
-def setup():
-     pass
-
-def part1(filename):
+def setup(filename):
      with open(filename) as f:
           while True:
                l = f.readline()
@@ -105,7 +103,8 @@ def part1(filename):
           # With a turn for each monkey in order.
           for monkey_no in range(len(Monkey.all_monkeys.keys())):
                Monkey.all_monkeys[monkey_no].take_turn()
-     
+
+def part1(filename):
      sorted_monkeys = sorted(Monkey.all_monkeys.values())
      print(sorted_monkeys[-2].inspected_count * sorted_monkeys[-1].inspected_count)
 
@@ -113,7 +112,7 @@ def part2(filename):
      pass
 
 if __name__ == '__main__':
-     setup()
+     setup(sys.argv[2])
      if sys.argv[1] == '1':
           part1(sys.argv[2])
      else:
