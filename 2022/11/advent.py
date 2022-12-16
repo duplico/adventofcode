@@ -98,13 +98,13 @@ def setup(filename):
                     true_dest=true_target,
                     false_dest=false_target
                )
+
+def part1(filename):
      # Run 20 rounds
      for round in range(20):
           # With a turn for each monkey in order.
           for monkey_no in range(len(Monkey.all_monkeys.keys())):
                Monkey.all_monkeys[monkey_no].take_turn()
-
-def part1(filename):
      sorted_monkeys = sorted(Monkey.all_monkeys.values())
      print(sorted_monkeys[-2].inspected_count * sorted_monkeys[-1].inspected_count)
 
