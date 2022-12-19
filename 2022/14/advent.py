@@ -82,7 +82,64 @@ def part1(filename):
 
 
 def part2(filename):
-     pass
+     material_coords = []
+     
+     left_side = 500
+     right_side = 500
+     depth = 0
+
+     for line in open(filename):
+          toks = line.strip().split('->')
+          for i in range(1, len(toks)):
+               # Draw the line between toks[i-1] and toks[i]
+               x1,y1 = map(int, toks[i-1].strip().split(','))
+               x2,y2 = map(int, toks[i].strip().split(','))
+
+               assert x1==x2 or y1==y2
+
+               depth = max(depth, y1, y2)
+               left_side = min(left_side, x1, x2)
+               right_side = max(right_side, x1, x2)
+
+               for x in range(min(x1,x2), max(x1,x2)+1):
+                    material_coords.append(Point(x,y1))
+               
+               for y in range(min(y1,y2), max(y1,y2)+1):
+                    material_coords.append(Point(x1,y))
+
+     depth += 2 # New floor level.
+     sand_count = 0
+     while True: # Generate infinite sand.
+          sand_pos = Point(500,0)
+          try:
+               while True: # Move the sand piece down
+                    # print("Moving down from %s" % str(sand_pos))
+                    try:
+                         for move in move_order:
+                              candidate_pos = Point(
+                                   x = sand_pos.x + move.x,
+                                   y = sand_pos.y + move.y
+                              )
+                              if candidate_pos.y == depth:
+                                   break # Can't penetrate floor.
+                              if candidate_pos not in material_coords:
+                                   # Sand can move there.
+                                   sand_pos = candidate_pos
+                                   raise SandMoved()
+                         # If we're here, we tried every move, and none were valid.
+                         # So the sand has settled.
+                         raise SandSettled()
+                    except SandMoved:
+                         continue # Continue trying to move the sand.
+          except SandSettled:
+               sand_count += 1
+               if sand_pos == Point(500, 0):
+                    break # It's piled all the way up.
+               # print("Settled at %s" % str(sand_pos))
+               material_coords.append(sand_pos)
+               continue # Continue the sand-generation loop.
+
+     print(sand_count)
 
 if __name__ == '__main__':
      setup()
