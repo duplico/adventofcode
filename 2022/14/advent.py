@@ -80,12 +80,22 @@ def part1(filename):
 
      print(sand_count)
 
+def show_material(material_coords, left, right, depth):
+     # print("Showing", left, right, depth)
+     s = ''
+     for y in range(depth):
+          for x in range(left, right+1):
+               if Point(x,y) in material_coords:
+                    s += 'X'
+               else:
+                    s += '.'
+          s += '\n'
+     print(s)
+
 
 def part2(filename):
-     material_coords = []
+     material_coords = set()
      
-     left_side = 500
-     right_side = 500
      depth = 0
 
      for line in open(filename):
@@ -98,16 +108,16 @@ def part2(filename):
                assert x1==x2 or y1==y2
 
                depth = max(depth, y1, y2)
-               left_side = min(left_side, x1, x2)
-               right_side = max(right_side, x1, x2)
 
                for x in range(min(x1,x2), max(x1,x2)+1):
-                    material_coords.append(Point(x,y1))
+                    material_coords.add(Point(x,y1))
                
                for y in range(min(y1,y2), max(y1,y2)+1):
-                    material_coords.append(Point(x1,y))
+                    material_coords.add(Point(x1,y))
 
      depth += 2 # New floor level.
+     left_side = 500 - depth - 1
+     right_side = 500 + depth + 1
      sand_count = 0
      while True: # Generate infinite sand.
           sand_pos = Point(500,0)
@@ -133,12 +143,14 @@ def part2(filename):
                          continue # Continue trying to move the sand.
           except SandSettled:
                sand_count += 1
+               material_coords.add(sand_pos)
+               if sand_count % 500 == 0:
+                    show_material(material_coords, left_side, right_side, depth)
                if sand_pos == Point(500, 0):
                     break # It's piled all the way up.
-               # print("Settled at %s" % str(sand_pos))
-               material_coords.append(sand_pos)
                continue # Continue the sand-generation loop.
 
+     show_material(material_coords, left_side, right_side, depth)
      print(sand_count)
 
 if __name__ == '__main__':
