@@ -1,4 +1,5 @@
 import sys
+from functools import cmp_to_key
 
 def setup():
      pass
@@ -51,7 +52,21 @@ def part1(filename):
      print(sum(correct_indices))
 
 def part2(filename):
-     pass
+     index = 1
+     all_packets = []
+     for line in open(filename):
+          if not line.strip():
+               continue
+          all_packets.append(eval(line))
+     all_packets.append([[2]])
+     all_packets.append([[6]])
+
+     all_packets.sort(key=cmp_to_key(cmp1))
+
+     decoder = all_packets.index([[2]])+1
+     decoder *= all_packets.index([[6]])+1
+
+     print(decoder)
 
 if __name__ == '__main__':
      setup()
