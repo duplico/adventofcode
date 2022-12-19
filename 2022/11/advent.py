@@ -13,6 +13,7 @@ def mul(a, b):
 @dataclass(order=True, kw_only=True)
 class Monkey():
      all_monkeys: ClassVar[Dict[int, 'Monkey']] = dict()
+     modulo: ClassVar[int] = 1
 
      inspected_count: int = 0
 
@@ -26,6 +27,7 @@ class Monkey():
 
      def __post_init__(self):
           Monkey.all_monkeys[self.num] = self
+          Monkey.modulo *= self.divisor
 
      def take_turn(self, debug=False, div_by_3=True):
           assert self.true_dest != self.num
@@ -52,6 +54,8 @@ class Monkey():
                     if debug:
                          print('  Monkey gets bored with item. Worry level is divided by 3 to %d' % worry_level)
 
+               worry_level = worry_level % Monkey.modulo
+
                # Test worry level against self.divisor:
                if worry_level % self.divisor == 0:
                     Monkey.all_monkeys[self.true_dest].items.append(worry_level)
@@ -63,6 +67,9 @@ class Monkey():
                          print('  Item with worry level %d is thrown to monkey %d' % (worry_level, self.false_dest))
 
           self.items = []
+
+     def __str__(self) -> str:
+          return 'Monkey %d inspected items %d times' % (self.num, self.inspected_count)
 
 def setup(filename):
      with open(filename) as f:
@@ -98,18 +105,25 @@ def setup(filename):
                     true_dest=true_target,
                     false_dest=false_target
                )
+
+def part1(filename):
      # Run 20 rounds
      for round in range(20):
           # With a turn for each monkey in order.
           for monkey_no in range(len(Monkey.all_monkeys.keys())):
                Monkey.all_monkeys[monkey_no].take_turn()
-
-def part1(filename):
      sorted_monkeys = sorted(Monkey.all_monkeys.values())
      print(sorted_monkeys[-2].inspected_count * sorted_monkeys[-1].inspected_count)
 
 def part2(filename):
-     pass
+     for round in range(10000):
+          # With a turn for each monkey in order.
+          for monkey_no in range(len(Monkey.all_monkeys.keys())):
+               Monkey.all_monkeys[monkey_no].take_turn(div_by_3=False)
+     sorted_monkeys = sorted(Monkey.all_monkeys.values())
+     for monkey in Monkey.all_monkeys.values():
+          print(str(monkey))
+     print(sorted_monkeys[-2].inspected_count * sorted_monkeys[-1].inspected_count)
 
 if __name__ == '__main__':
      setup(sys.argv[2])
