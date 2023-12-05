@@ -43,8 +43,6 @@ def part2(filename):
      for line in open(filename):
           toks = line.split()
           pos = 2
-          id = int(toks[1][:-1])
-          new_set = False
           this_set = dict(
                blue=0,
                red=0,
@@ -59,27 +57,13 @@ def part2(filename):
                     color = color[:-1]
                elif color[-1] == ';':
                     color = color[:-1]
-                    new_set = True
-               else:
-                    new_set = True
                
-               this_set[color] = cnt
-               
-               if new_set:
-                    print(id, pos, this_set)
-                    if this_set['blue'] > 14 or this_set['red'] > 12 or this_set['green'] > 13:
-                         break
-
-                    this_set = dict(
-                         blue=0,
-                         red=0,
-                         green=0
-                    )
-                    new_set = False
+               this_set[color] = max(this_set[color], cnt)
                
                pos += 2
-               if pos > len(toks):
-                    total += id
+               if pos >= len(toks):
+                    power = this_set['red'] * this_set['green'] * this_set['blue']
+                    total += power
                     break
      print(total)
 
