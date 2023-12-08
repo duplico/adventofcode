@@ -24,7 +24,22 @@ def part1(filename):
      print(prod)
 
 def part2(filename):
-     pass
+     prod = 1
+     with open(filename) as f:
+          time = int(''.join(f.readline().strip().split()[1:]))
+          max_distance = int(''.join(f.readline().strip().split()[1:]))
+     print(time, max_distance)     
+     # distance is (time-holdtime) * hold_time.
+     # Let's try a linear search for the shortest hold and longest hold that will work.
+     for hold_time in range(time):
+          if (time - hold_time) * hold_time > max_distance:
+               lowest_hold = hold_time
+               break
+     for hold_time in reversed(range(time)):
+          if (time - hold_time) * hold_time > max_distance:
+               highest_hold = hold_time
+               break
+     print(highest_hold, lowest_hold, highest_hold-lowest_hold+1)
 
 if __name__ == '__main__':
      setup()
