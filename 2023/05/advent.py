@@ -107,8 +107,8 @@ def part2(filename):
      # While True:
      #  Is our seed range fully less than src range? Add it to next_seeds and pop seed_range.
      #  Is our seed range fully more than src range? Keep it, and pop dst_map
-     #  Is our seed range is partially below the src map? Split it, adding the lower part to next_seeds, keeping the rest.
-     #  Is our seed range is partially above the src map? Split it, keeping the overlap and pushing the rest onto seeds
+     #  Is our seed range partially below the src map? Split it, adding the lower part to next_seeds, keeping the rest.
+     #  Is our seed range partially above the src map? Split it, keeping the overlap and pushing the rest onto seeds
      #  Else, our seed range is fully within the src map. Apply the src:dst map, add it to next_seeds, and pop seeds.
 
      next_seeds = seeds
