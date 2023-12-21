@@ -18,6 +18,8 @@ inverted = {
      (0, 1): (0, -1)
 }
 
+pipe_map = []
+
 def connects(pipe_piece, delta):
      return delta in pipe_connections[pipe_piece]
 
@@ -30,6 +32,7 @@ def get_delta(pipe_piece, src_delta):
 sys.setrecursionlimit(100000) # lol.
 def loop_len(pipes: list, running_len: int, coords: tuple[int, int], src_delta: tuple[int, int]):
      pipe_piece = pipes[coords[0]][coords[1]]
+     pipe_map[coords[0]][coords[1]] = 'X'
 
      # Base case: loop completed.
      if pipe_piece == 'S':
@@ -53,7 +56,8 @@ def part1(filename):
      pipes = []
 
      for line in open(filename):
-          pipes.append(line.strip())
+          pipes.append(list(line.strip()))
+          pipe_map.append(list('.'*len(line.strip())))
           if 'S' in line:
                starting_c = line.find('S')
           if starting_c == -1:
