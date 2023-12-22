@@ -32,11 +32,19 @@ def get_delta(pipe_piece, src_delta):
 sys.setrecursionlimit(100000) # lol.
 def loop_len(pipes: list, running_len: int, coords: tuple[int, int], src_delta: tuple[int, int]):
      pipe_piece = pipes[coords[0]][coords[1]]
-     pipe_map[coords[0]][coords[1]] = 'X'
 
      # Base case: loop completed.
      if pipe_piece == 'S':
+          # Complete the pipe map with the appropriate piece shape.
+          for pipe_piece, deltas in pipe_connections.items():
+               if not deltas:
+                    continue
+               if pipe_map[coords[0] + deltas[0][0]][coords[1] + deltas[0][1]] != '.' and pipe_map[coords[0] + deltas[1][0]][coords[1] + deltas[1][1]] != '.':
+                    pipe_map[coords[0]][coords[1]] = pipe_piece
+                    break
           return running_len
+     
+     pipe_map[coords[0]][coords[1]] = pipe_piece
      
      # Otherwise, find what our pipe connects to.
      delta = get_delta(pipe_piece, src_delta)
@@ -89,7 +97,9 @@ def part1(filename):
      )/2)
 
 def part2(filename):
-     pass
+     part1(filename)
+     for line in pipe_map:
+          print(''.join(line))
 
 if __name__ == '__main__':
      setup()
