@@ -98,8 +98,51 @@ def part1(filename):
 
 def part2(filename):
      part1(filename)
+
+     inside_count = 0
+     for r in range(len(pipe_map)):
+          inside = False
+          wall_type = ''
+          for c in range(len(pipe_map[r])):
+               pipe_piece = pipe_map[r][c]
+
+               # Simplest case: is it a non-pipe section?
+               #  If so, flag it inside/outside based on our current status.
+               if pipe_piece == '.':
+                    if inside:
+                         pipe_map[r][c] = 'I'
+                         inside_count += 1
+                    else:
+                         pipe_map[r][c] = 'O'
+                    continue
+
+               # Second simplest case: is it a simple vertical wall?
+               #  If so, toggle inside/outside
+               if pipe_piece == '|':
+                    inside = not inside
+                    continue
+               
+               # Is it the start of a horizontal run?
+               if pipe_piece in 'FL':
+                    # Start of a horizontal run; toggle the wall flag on,
+                    #  and then wait until the wall is closed to determine
+                    #  whether our inside/outside status has changed.
+                    wall_type = pipe_piece
+                    continue
+
+               # If we're here, it's the end of a horizontal run.
+               # Need to determine whether it changes out inside-ness or not.
+               if (wall_type == 'F' and pipe_piece == 'J') or (wall_type == 'L' and pipe_piece == '7'):
+                    # FJ and L7 are "vertical" direction changes, so impute a vertical wall here and
+                    # toggle inside/outside.
+                    inside = not inside
+               
+               # Otherwise, we have a F7 or LJ situation, which doesn't create a vertical wall.
+
+
      for line in pipe_map:
           print(''.join(line))
+     print(inside_count)
 
 if __name__ == '__main__':
      setup()
