@@ -13,3 +13,13 @@
 2020/17/advent17b/Cargo.lock
 2021/.python-version
 *input*.txt
+
+# Clojure
+.cpcache/
+.nrepl-port
+target/
+*.log
+.clj-kondo/.cache/
+.lsp/.cache/
+.calva/
+.rebel_readline_history
