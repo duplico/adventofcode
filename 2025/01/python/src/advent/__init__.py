@@ -1,28 +1,38 @@
+"""Advent of Code solution."""
+
+import functools
+
 import click
 from rich.console import Console
-import functools
 
 console = Console()
 
-def setup():
+
+def setup() -> None:
+    """Perform any setup needed before running solutions."""
     pass
 
-def common_options(f):
-    @click.argument('filename', type=click.Path(exists=True))
-    @click.option('-v', '--verbose', count=True, help='Enable verbose output (-v, -vv)')
+
+def common_options[F](f: F) -> F:
+    """Decorator that adds common CLI options to a command."""
+    @click.argument("filename", type=click.Path(exists=True))
+    @click.option("-v", "--verbose", count=True, help="Enable verbose output (-v, -vv)")
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         return f(*args, **kwargs)
     return wrapper
 
+
 @click.group()
-def cli():
-    """Advent of Code 2025 Day 1 solution."""
+def cli() -> None:
+    """Advent of Code solution."""
     setup()
 
-@cli.command(name='1')
+
+@cli.command(name="1")
 @common_options
-def part1(filename: str, verbose: int):
+def part1(filename: str, verbose: int) -> None:
+    """Run part 1 of the solution."""
     pos = 50
     zeroes = 0
 
@@ -95,9 +105,10 @@ def part2_turn_dial(current_pos: int, distance: int, verbose: int = 0) -> tuple[
     else:
         return part2_turn_dial_left(current_pos, -distance, zeroes, verbose)
 
-@cli.command(name='2')
+@cli.command(name="2")
 @common_options
-def part2(filename: str, verbose: int):
+def part2(filename: str, verbose: int) -> None:
+    """Run part 2 of the solution."""
     pos = 50
     zeroes = 0
 
@@ -117,5 +128,5 @@ def part2(filename: str, verbose: int):
                 console.print(f"The dial is rotated [yellow]{line}[/yellow] to point at [bold cyan]{pos}[/bold cyan]; during this rotation, it points at zero [bold green]{zeroes_to_add}[/bold green] times.")
     console.print(f"The dial pointed at 0 a total of [bold green]{zeroes}[/bold green] times.")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
