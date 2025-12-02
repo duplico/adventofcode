@@ -23,3 +23,10 @@ target/
 .lsp/.cache/
 .calva/
 .rebel_readline_history
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
