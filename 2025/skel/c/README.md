@@ -11,8 +11,8 @@ make debug    # Debug build with sanitizers
 
 ```bash
 # Direct
-./advent 1 input.txt
-./advent 2 input.txt -v
+./advent 1 ../input.txt
+./advent 2 ../input.txt -v
 
 # Via make
 make run1

@@ -8,7 +8,7 @@ set shell := ["bash", "-uc"]
 default:
     @just --list
 
-# Create a new day from a skeleton
+# Create a new day/language from a skeleton
 # Usage: just new <day> <language>
 # Example: just new 02 python
 new day lang:
@@ -18,7 +18,7 @@ new day lang:
     DAY="{{day}}"
     LANG="{{lang}}"
     SKEL_DIR="skel/${LANG}"
-    TARGET_DIR="${DAY}"
+    TARGET_DIR="${DAY}/${LANG}"
 
     # Validate day format (01-25)
     if [[ ! "$DAY" =~ ^[0-2][0-9]$ ]]; then
@@ -40,12 +40,15 @@ new day lang:
         exit 1
     fi
 
-    # Copy skeleton
-    cp -r "$SKEL_DIR" "$TARGET_DIR"
+    # Create day directory if needed
+    mkdir -p "$DAY"
 
-    # Create empty input files
-    touch "$TARGET_DIR/input.txt"
-    touch "$TARGET_DIR/sample_input.txt"
+    # Create shared input files if they don't exist
+    touch "$DAY/input.txt"
+    touch "$DAY/sample_input.txt"
+
+    # Copy skeleton to language subdirectory
+    cp -r "$SKEL_DIR" "$TARGET_DIR"
 
     # Language-specific post-processing
     case "$LANG" in
@@ -61,85 +64,136 @@ new day lang:
             echo "Rust project ready. Run 'cargo build' to compile."
             ;;
         clojure)
-            echo "Clojure project ready. Run 'clj -M:run 1 input.txt' to start."
+            echo "Clojure project ready. Run 'clj -M:run 1 ../input.txt' to start."
             ;;
         c)
             echo "C project ready. Run 'make' to compile."
             ;;
         tcl)
-            echo "Tcl project ready. Run 'tclsh advent.tcl 1 input.txt' to start."
+            echo "Tcl project ready. Run 'tclsh advent.tcl 1 ../input.txt' to start."
             ;;
     esac
 
     echo ""
-    echo "✓ Created day $DAY using $LANG skeleton"
-    echo "  Directory: $TARGET_DIR/"
+    echo "✓ Created day $DAY/$LANG"
+    echo ""
+    echo "Directory structure:"
+    echo "  $DAY/"
+    echo "  ├── input.txt          # Your puzzle input"
+    echo "  ├── sample_input.txt   # Sample input from puzzle"
+    echo "  └── $LANG/             # Your solution"
     echo ""
     echo "Next steps:"
-    echo "  1. Paste your puzzle input into $TARGET_DIR/input.txt"
-    echo "  2. Paste sample input into $TARGET_DIR/sample_input.txt"
-    echo "  3. Start coding!"
+    echo "  1. Paste your puzzle input into $DAY/input.txt"
+    echo "  2. Paste sample input into $DAY/sample_input.txt"
+    echo "  3. cd $TARGET_DIR && start coding!"
 
 # List available skeleton languages
 langs:
     @echo "Available languages:"
     @ls -1 skel/
 
-# Run a solution (auto-detects language)
-# Usage: just run <day> <part> [args...]
-# Example: just run 01 1 -v
-run day part *args:
+# List languages used for a specific day
+day-langs day:
+    #!/usr/bin/env bash
+    DAY="{{day}}"
+    if [[ ! -d "$DAY" ]]; then
+        echo "Day $DAY does not exist"
+        exit 1
+    fi
+    echo "Languages for day $DAY:"
+    for dir in "$DAY"/*/; do
+        if [[ -d "$dir" ]]; then
+            basename "$dir"
+        fi
+    done
+
+# Run a solution
+# Usage: just run <day> <language> <part> [args...]
+# Example: just run 02 python 1 -v
+run day lang part *args:
     #!/usr/bin/env bash
     set -euo pipefail
 
     DAY="{{day}}"
+    LANG="{{lang}}"
     PART="{{part}}"
     ARGS="{{args}}"
+    TARGET_DIR="${DAY}/${LANG}"
 
-    cd "$DAY"
-
-    if [[ -f "pyproject.toml" ]]; then
-        uv run advent "$PART" input.txt $ARGS
-    elif [[ -f "Cargo.toml" ]]; then
-        cargo run --release -- "$PART" input.txt $ARGS
-    elif [[ -f "go.mod" ]]; then
-        go run . "$PART" input.txt $ARGS
-    elif [[ -f "deps.edn" ]]; then
-        clj -M:run "$PART" input.txt $ARGS
-    elif [[ -f "Makefile" ]]; then
-        make && ./advent "$PART" input.txt $ARGS
-    elif [[ -f "advent.tcl" ]]; then
-        tclsh advent.tcl "$PART" input.txt $ARGS
-    else
-        echo "Error: Could not detect language for day $DAY"
+    if [[ ! -d "$TARGET_DIR" ]]; then
+        echo "Error: $TARGET_DIR does not exist"
+        echo "Create it with: just new $DAY $LANG"
         exit 1
     fi
+
+    cd "$TARGET_DIR"
+
+    case "$LANG" in
+        python)
+            uv run advent "$PART" ../input.txt $ARGS
+            ;;
+        rust)
+            cargo run --release -- "$PART" ../input.txt $ARGS
+            ;;
+        go)
+            go run . "$PART" ../input.txt $ARGS
+            ;;
+        clojure)
+            clj -M:run "$PART" ../input.txt $ARGS
+            ;;
+        c)
+            make -s && ./advent "$PART" ../input.txt $ARGS
+            ;;
+        tcl)
+            tclsh advent.tcl "$PART" ../input.txt $ARGS
+            ;;
+        *)
+            echo "Error: Unknown language '$LANG'"
+            exit 1
+            ;;
+    esac
 
 # Run with sample input
-# Usage: just sample <day> <part> [args...]
-sample day part *args:
+# Usage: just sample <day> <language> <part> [args...]
+sample day lang part *args:
     #!/usr/bin/env bash
     set -euo pipefail
 
     DAY="{{day}}"
+    LANG="{{lang}}"
     PART="{{part}}"
     ARGS="{{args}}"
+    TARGET_DIR="${DAY}/${LANG}"
 
-    cd "$DAY"
-
-    if [[ -f "pyproject.toml" ]]; then
-        uv run advent "$PART" sample_input.txt $ARGS
-    elif [[ -f "Cargo.toml" ]]; then
-        cargo run -- "$PART" sample_input.txt $ARGS
-    elif [[ -f "go.mod" ]]; then
-        go run . "$PART" sample_input.txt $ARGS
-    elif [[ -f "deps.edn" ]]; then
-        clj -M:run "$PART" sample_input.txt $ARGS
-    elif [[ -f "Makefile" ]]; then
-        make && ./advent "$PART" sample_input.txt $ARGS
-    elif [[ -f "advent.tcl" ]]; then
-        tclsh advent.tcl "$PART" sample_input.txt $ARGS
-    else
-        echo "Error: Could not detect language for day $DAY"
+    if [[ ! -d "$TARGET_DIR" ]]; then
+        echo "Error: $TARGET_DIR does not exist"
         exit 1
     fi
+
+    cd "$TARGET_DIR"
+
+    case "$LANG" in
+        python)
+            uv run advent "$PART" ../sample_input.txt $ARGS
+            ;;
+        rust)
+            cargo run -- "$PART" ../sample_input.txt $ARGS
+            ;;
+        go)
+            go run . "$PART" ../sample_input.txt $ARGS
+            ;;
+        clojure)
+            clj -M:run "$PART" ../sample_input.txt $ARGS
+            ;;
+        c)
+            make -s && ./advent "$PART" ../sample_input.txt $ARGS
+            ;;
+        tcl)
+            tclsh advent.tcl "$PART" ../sample_input.txt $ARGS
+            ;;
+        *)
+            echo "Error: Unknown language '$LANG'"
+            exit 1
+            ;;
+    esac

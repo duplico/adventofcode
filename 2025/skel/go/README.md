@@ -4,13 +4,16 @@
 
 ```bash
 # Run directly
-go run . 1 input.txt
-go run . 2 input.txt -v
+go run . 1 ../input.txt
+go run . 2 ../input.txt -v
 
 # Build and run
 go build -o advent .
-./advent 1 input.txt
-./advent -v 2 input.txt
+./advent 1 ../input.txt
+./advent -v 2 ../input.txt
+
+# With sample input
+go run . 1 ../sample_input.txt
 ```
 
 ## Build optimized

@@ -8,10 +8,13 @@ Solutions to [Advent of Code 2025](https://adventofcode.com/2025) puzzles.
 # Create a new day (after installing dependencies below)
 just new 02 python
 
+# Add another language to the same day
+just new 02 rust
+
 # Run a solution
-just run 02 1           # part 1
-just run 02 2 -v        # part 2, verbose
-just sample 02 1        # part 1 with sample_input.txt
+just run 02 python 1           # day 02, python, part 1
+just run 02 python 2 -v        # part 2, verbose
+just sample 02 python 1        # part 1 with sample_input.txt
 ```
 
 ## Installing Dependencies
@@ -69,9 +72,9 @@ uv python list
 **Usage:**
 
 ```bash
-cd 02
+cd 02/python
 uv sync                      # Install dependencies
-uv run advent 1 input.txt    # Run part 1
+uv run advent 1 ../input.txt    # Run part 1
 ```
 
 ---
@@ -95,8 +98,8 @@ cargo --version
 **Usage:**
 
 ```bash
-cd 02
-cargo run --release -- 1 input.txt
+cd 02/rust
+cargo run --release -- 1 ../input.txt
 ```
 
 ---
@@ -124,8 +127,8 @@ go version
 **Usage:**
 
 ```bash
-cd 02
-go run . 1 input.txt
+cd 02/go
+go run . 1 ../input.txt
 ```
 
 ---
@@ -153,8 +156,8 @@ clj --version
 **Usage:**
 
 ```bash
-cd 02
-clj -M:run 1 input.txt
+cd 02/clojure
+clj -M:run 1 ../input.txt
 
 # Or start a REPL
 clj
@@ -179,9 +182,9 @@ gcc --version
 **Usage:**
 
 ```bash
-cd 02
+cd 02/c
 make
-./advent 1 input.txt
+./advent 1 ../input.txt
 ```
 
 ---
@@ -214,8 +217,8 @@ sudo make install
 **Usage:**
 
 ```bash
-cd 02
-tclsh advent.tcl 1 input.txt
+cd 02/tcl
+tclsh advent.tcl 1 ../input.txt
 ```
 
 ---
@@ -233,37 +236,48 @@ just langs
 # Create day 02 with Python
 just new 02 python
 
-# Create day 03 with Rust
-just new 03 rust
+# Add Rust to the same day
+just new 02 rust
 
-# Create day 04 with Go
-just new 04 go
+# See what languages a day has
+just day-langs 02
 ```
 
 This will:
 
-1. Copy the skeleton for that language
-2. Create empty `input.txt` and `sample_input.txt` files
+1. Create the day directory with shared `input.txt` and `sample_input.txt`
+2. Copy the language skeleton to a subdirectory (e.g., `02/python/`)
 3. Run any language-specific initialization (e.g., `uv sync` for Python)
 
 ## Running Solutions
 
 ```bash
-# Run with real input
-just run 02 1           # day 02, part 1
-just run 02 2 -v        # day 02, part 2, verbose
+# Run with real input (via just)
+just run 02 python 1           # day 02, python, part 1
+just run 02 python 2 -v        # part 2, verbose
+just run 02 rust 1             # same day, different language
 
 # Run with sample input
-just sample 02 1
+just sample 02 python 1
 
-# Or run directly in the day directory
-cd 02
-uv run advent 1 input.txt         # Python
-cargo run --release -- 1 input.txt # Rust
-go run . 1 input.txt               # Go
-clj -M:run 1 input.txt            # Clojure
-make && ./advent 1 input.txt      # C
-tclsh advent.tcl 1 input.txt      # Tcl
+# Or run directly in the language directory
+cd 02/python
+uv run advent 1 ../input.txt         # Python
+
+cd 02/rust
+cargo run --release -- 1 ../input.txt # Rust
+
+cd 02/go
+go run . 1 ../input.txt               # Go
+
+cd 02/clojure
+clj -M:run 1 ../input.txt            # Clojure
+
+cd 02/c
+make && ./advent 1 ../input.txt      # C
+
+cd 02/tcl
+tclsh advent.tcl 1 ../input.txt      # Tcl
 ```
 
 ## Directory Structure
@@ -279,7 +293,19 @@ tclsh advent.tcl 1 input.txt      # Tcl
 │   ├── clojure/
 │   ├── c/
 │   └── tcl/
-├── 01/                   # Day 01 solution
-├── 02/                   # Day 02 solution
+├── 01/                   # Day 01 (old single-language structure)
+│   └── ...
+├── 02/                   # Day 02 (multi-language structure)
+│   ├── input.txt         # Shared puzzle input
+│   ├── sample_input.txt  # Shared sample input
+│   ├── python/           # Python solution
+│   │   ├── pyproject.toml
+│   │   └── src/advent/
+│   ├── rust/             # Rust solution
+│   │   ├── Cargo.toml
+│   │   └── src/main.rs
+│   └── clojure/          # Clojure solution
+│       ├── deps.edn
+│       └── src/advent.clj
 └── ...
 ```

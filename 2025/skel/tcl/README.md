@@ -4,11 +4,14 @@
 
 ```bash
 # Part 1
-tclsh advent.tcl 1 input.txt
-tclsh advent.tcl 1 input.txt -v    # verbose
+tclsh advent.tcl 1 ../input.txt
+tclsh advent.tcl 1 ../input.txt -v    # verbose
 
 # Part 2
-tclsh advent.tcl 2 input.txt
+tclsh advent.tcl 2 ../input.txt
+
+# With sample input
+tclsh advent.tcl 1 ../sample_input.txt
 ```
 
 ## Interactive REPL
@@ -16,7 +19,7 @@ tclsh advent.tcl 2 input.txt
 ```bash
 tclsh
 % source advent.tcl
-% part1 "sample_input.txt"
+% part1 "../sample_input.txt"
 ```
 
 ## Tcllib Packages
