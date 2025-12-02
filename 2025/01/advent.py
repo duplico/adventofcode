@@ -87,6 +87,14 @@ def part2_turn_dial_left(current_pos: int, distance: int, zeroes: int, verbose: 
 
     return part2_turn_dial_left(current_pos, distance, zeroes, verbose)
 
+def part2_turn_dial(current_pos: int, distance: int, verbose: int = 0) -> tuple[int, int]:
+    zeroes = 0
+
+    if distance > 0:
+        return part2_turn_dial_right(current_pos, distance, zeroes, verbose)
+    else:
+        return part2_turn_dial_left(current_pos, -distance, zeroes, verbose)
+
 @cli.command(name='2')
 @common_options
 def part2(filename: str, verbose: int):
@@ -102,14 +110,8 @@ def part2(filename: str, verbose: int):
             dir = -1 if line[0] == 'L' else 1
             dist = int(line[1:])
 
-            if dir == 1: # right
-                pos, zeroes_to_add = part2_turn_dial_right(pos, dist, 0, verbose)
-            else: # left
-                pos, zeroes_to_add = part2_turn_dial_left(pos, dist, 0, verbose)
+            pos, zeroes_to_add = part2_turn_dial(pos, dir * dist, verbose)
             zeroes += zeroes_to_add
-
-            if pos == 100:
-                pos = 0
 
             if verbose >= 1:
                 console.print(f"The dial is rotated [yellow]{line}[/yellow] to point at [bold cyan]{pos}[/bold cyan]; during this rotation, it points at zero [bold green]{zeroes_to_add}[/bold green] times.")
