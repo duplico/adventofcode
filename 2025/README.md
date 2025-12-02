@@ -1,0 +1,285 @@
+# Advent of Code 2025
+
+Solutions to [Advent of Code 2025](https://adventofcode.com/2025) puzzles.
+
+## Quick Start
+
+```bash
+# Create a new day (after installing dependencies below)
+just new 02 python
+
+# Run a solution
+just run 02 1           # part 1
+just run 02 2 -v        # part 2, verbose
+just sample 02 1        # part 1 with sample_input.txt
+```
+
+## Installing Dependencies
+
+This guide assumes **Debian 12 (Bookworm)** or **Debian 13 (Trixie)**.
+
+### Task Runner: just
+
+[just](https://github.com/casey/just) is a modern command runner used to initialize new days and run solutions.
+
+```bash
+# Install prebuilt binary (recommended)
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin
+
+# Make sure ~/.local/bin is in your PATH
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify
+just --version
+```
+
+Alternative: Install via cargo if you have Rust (see below):
+
+```bash
+cargo install just
+```
+
+---
+
+## Language Setup
+
+### Python (via uv)
+
+[uv](https://docs.astral.sh/uv/) is an extremely fast Python package and project manager from Astral (creators of Ruff). It handles both Python version management and virtual environments.
+
+```bash
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Restart shell or source the env
+source ~/.bashrc  # or ~/.zshrc
+
+# Install Python 3.14 (free-threaded build for no-GIL experiments)
+uv python install 3.14
+
+# Optionally install the free-threaded variant
+uv python install 3.14t
+
+# Verify
+uv --version
+uv python list
+```
+
+**Usage:**
+
+```bash
+cd 02
+uv sync                      # Install dependencies
+uv run advent 1 input.txt    # Run part 1
+```
+
+---
+
+### Rust (via rustup)
+
+[rustup](https://rustup.rs/) is the official Rust toolchain installer.
+
+```bash
+# Install rustup and stable Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Follow prompts, then restart shell or:
+source ~/.cargo/env
+
+# Verify
+rustc --version
+cargo --version
+```
+
+**Usage:**
+
+```bash
+cd 02
+cargo run --release -- 1 input.txt
+```
+
+---
+
+### Go (official binary)
+
+Download the latest Go from [go.dev](https://go.dev/dl/).
+
+```bash
+# Download and install (check for latest version at go.dev/dl)
+GO_VERSION="1.23.4"
+wget "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz"
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
+rm "go${GO_VERSION}.linux-amd64.tar.gz"
+
+# Add to PATH
+echo 'export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify
+go version
+```
+
+**Usage:**
+
+```bash
+cd 02
+go run . 1 input.txt
+```
+
+---
+
+### Clojure (via official installer)
+
+Clojure uses the [Clojure CLI tools](https://clojure.org/guides/install_clojure) (`clj`/`clojure`).
+
+```bash
+# Install Java first (Clojure runs on the JVM)
+sudo apt update
+sudo apt install -y default-jdk rlwrap  # Installs latest JDK for your Debian version
+
+# Install Clojure CLI tools
+curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
+chmod +x linux-install.sh
+sudo ./linux-install.sh
+rm linux-install.sh
+
+# Verify
+java --version
+clj --version
+```
+
+**Usage:**
+
+```bash
+cd 02
+clj -M:run 1 input.txt
+
+# Or start a REPL
+clj
+```
+
+---
+
+### C (GCC from Debian)
+
+Debian's GCC is modern enough for most AoC puzzles.
+
+```bash
+sudo apt update
+sudo apt install -y build-essential  # Installs gcc, make, etc.
+
+# Verify
+gcc --version
+```
+
+**Note:** Debian 12 ships GCC 12, Debian 13 ships GCC 14. Some C23 features require GCC 14+. The skeleton uses `-std=c23` but will fall back gracefully on older GCC versions for most code.
+
+**Usage:**
+
+```bash
+cd 02
+make
+./advent 1 input.txt
+```
+
+---
+
+### Tcl
+
+Tcl 8.6 from Debian is sufficient for Advent of Code. ActiveTcl is no longer the recommended distribution.
+
+```bash
+# Install from Debian repos (Tcl 8.6)
+sudo apt update
+sudo apt install -y tcl tcllib
+
+# Verify
+tclsh <<< 'puts [info patchlevel]'
+```
+
+For Tcl 9.0 (released 2024), you'd need to build from source:
+
+```bash
+# Optional: Tcl 9.0 from source
+wget https://prdownloads.sourceforge.net/tcl/tcl9.0.0-src.tar.gz
+tar xzf tcl9.0.0-src.tar.gz
+cd tcl9.0.0/unix
+./configure --prefix=/usr/local
+make
+sudo make install
+```
+
+**Usage:**
+
+```bash
+cd 02
+tclsh advent.tcl 1 input.txt
+```
+
+---
+
+## Creating a New Day
+
+Once dependencies are installed:
+
+```bash
+cd 2025
+
+# See available languages
+just langs
+
+# Create day 02 with Python
+just new 02 python
+
+# Create day 03 with Rust
+just new 03 rust
+
+# Create day 04 with Go
+just new 04 go
+```
+
+This will:
+
+1. Copy the skeleton for that language
+2. Create empty `input.txt` and `sample_input.txt` files
+3. Run any language-specific initialization (e.g., `uv sync` for Python)
+
+## Running Solutions
+
+```bash
+# Run with real input
+just run 02 1           # day 02, part 1
+just run 02 2 -v        # day 02, part 2, verbose
+
+# Run with sample input
+just sample 02 1
+
+# Or run directly in the day directory
+cd 02
+uv run advent 1 input.txt         # Python
+cargo run --release -- 1 input.txt # Rust
+go run . 1 input.txt               # Go
+clj -M:run 1 input.txt            # Clojure
+make && ./advent 1 input.txt      # C
+tclsh advent.tcl 1 input.txt      # Tcl
+```
+
+## Directory Structure
+
+```plaintext
+2025/
+├── justfile              # Task runner commands
+├── README.md             # This file
+├── skel/                 # Project templates
+│   ├── python/
+│   ├── rust/
+│   ├── go/
+│   ├── clojure/
+│   ├── c/
+│   └── tcl/
+├── 01/                   # Day 01 solution
+├── 02/                   # Day 02 solution
+└── ...
+```
