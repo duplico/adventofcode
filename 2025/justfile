@@ -197,3 +197,39 @@ sample day lang part *args:
             exit 1
             ;;
     esac
+
+# Open a REPL for a day/language (where supported)
+# Usage: just repl <day> <language>
+# Example: just repl 02 clojure
+repl day lang:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    DAY="{{day}}"
+    LANG="{{lang}}"
+    TARGET_DIR="${DAY}/${LANG}"
+
+    if [[ ! -d "$TARGET_DIR" ]]; then
+        echo "Error: $TARGET_DIR does not exist"
+        echo "Create it with: just new $DAY $LANG"
+        exit 1
+    fi
+
+    cd "$TARGET_DIR"
+
+    case "$LANG" in
+        python)
+            uv run python -i -c "from advent import *; print('Advent module loaded. Functions available.')"
+            ;;
+        clojure)
+            clj -M:rebel
+            ;;
+        tcl)
+            tclsh
+            ;;
+        *)
+            echo "Error: REPL not supported for '$LANG'"
+            echo "Supported languages: python, clojure, tcl"
+            exit 1
+            ;;
+    esac
