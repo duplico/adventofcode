@@ -36,7 +36,7 @@
          (recur new-digits new-output (dec n))))))
 
 (defn shift-or-keep
-  "Implementation of part 1 solution. Actually a special case of part 2, although it may be more efficient:
+  "Implementation of part 1 solution. Actually a special case of part 2.
    Given a vector of digits, recursively build the maximum number by replacing the current
    number with either:
    - keeping it as is
