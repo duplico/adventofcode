@@ -280,6 +280,28 @@ cd 02/tcl
 tclsh advent.tcl 1 ../input.txt      # Tcl
 ```
 
+## Interactive REPLs
+
+Some languages support interactive REPLs for exploratory development and debugging:
+
+```bash
+# Open a REPL (via just)
+just repl 02 python      # Python with advent module pre-loaded
+just repl 02 clojure     # Clojure with rebel-readline and advent loaded
+just repl 02 tcl         # Basic Tcl shell
+
+# Or start directly
+cd 02/python
+uv run python -i -c "from advent import *"
+
+cd 02/clojure
+clj -M:rebel             # Enhanced REPL with auto-import
+```
+
+**Supported languages:** Python, Clojure, Tcl
+
+The Clojure REPL uses [rebel-readline](https://github.com/bhauman/rebel-readline) for a better experience and automatically imports all functions from the `advent` namespace via `dev/user.clj`.
+
 ## Directory Structure
 
 ```plaintext
