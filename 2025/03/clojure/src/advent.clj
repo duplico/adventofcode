@@ -9,8 +9,35 @@
   [filename]
   (-> filename slurp str/trim (str/split-lines)))
 
+(defn digit-seq-value
+  "Given a vector of digits (length should be 12), return the numeric value."
+  ^Long
+  [digits]
+  (reduce (fn [acc d] (+ (* acc 10) d)) 0 digits))
+
+(defn condense-number-vec
+  "Primary implementation of the part 2 solution, which is a generalization of part 1:
+   Given a vector of digits, accumulated running output, and remaining target length n,
+   select the highest digit within the vector's first (count - n + 1) digits, append it to the output,
+   and recurse until the output has length n."
+  ^Long
+  ([^String line ^long n] (condense-number-vec (vec (map #(Character/digit % 10) line)) [] n))
+  ([digits output ^long n]
+   (if (= n 0) (digit-seq-value output)
+       (let [search-len (- (count digits) (- n 1))
+             search-space (subvec digits 0 search-len)
+             max-digit (apply max search-space)
+             max-index (.indexOf search-space max-digit)
+             new-output (conj output max-digit)
+             new-digits (subvec digits (+ max-index 1))]
+         (when *verbose*
+           (println (format "  digits=%s n=%d -> max-digit=%d at index %d -> output=%s"
+                            digits n max-digit max-index new-output)))
+         (recur new-digits new-output (dec n))))))
+
 (defn shift-or-keep
-  "Given a vector of digits, recursively build the maximum number by replacing the current
+  "Implementation of part 1 solution. Actually a special case of part 2, although it may be more efficient:
+   Given a vector of digits, recursively build the maximum number by replacing the current
    number with either:
    - keeping it as is
    - shifting in the next digit at the tens place (with the current tens place moving to ones)
@@ -41,16 +68,17 @@
    (let [digits (vec (map #(Character/digit % 10) line))]
      (shift-or-keep (pop digits) (peek digits)))))
 
-
 (defn part1
   "Solve part 1 of the puzzle."
   [filename]
   (let [lines (read-lines filename)]
     (when *verbose*
       (println (format "Read %d lines from %s" (count lines) filename)))
-
+    
     ;; Sum shift-or-keep for all lines
     (let [result (reduce + (map shift-or-keep lines))]
+    ;; Alternative: Sum shift-or-keep-n for all lines with n=2
+    ;; (let [result (reduce + (map #(condense-number-vec % 2) lines))]
       (println (format "Part 1: %d" result)))))
 
 (defn part2
@@ -60,8 +88,8 @@
     (when *verbose*
       (println (format "Read %d lines from %s" (count lines) filename)))
 
-    ;; TODO: Implement solution
-    (let [result 0]
+    ;; Sum shift-or-keep-n for all lines with n=12
+    (let [result (reduce + (map #(condense-number-vec % 12) lines))]
       (println (format "Part 2: %d" result)))))
 
 (defn -main
