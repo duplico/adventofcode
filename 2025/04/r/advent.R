@@ -1,18 +1,20 @@
 #!/usr/bin/env Rscript
 #
 # Advent of Code solution
-# Usage: Rscript advent.R <part> <filename> [-v]
+# Usage: Rscript advent.R <part> <filename> [-v] [--gif]
 #
 
 suppressPackageStartupMessages(library(optparse))
 
-# Global verbose flag
+# Global flags
 verbose <- FALSE
+make_gif <- FALSE
 
 # Read all lines from a file
 read_lines <- function(filename) {
   lines <- readLines(filename, warn = FALSE)
   lines <- trimws(lines)
+  vprint("Read", length(lines), "lines from", filename)
   lines[lines != ""]
 }
 
@@ -42,10 +44,6 @@ shift_dl <- function(m) shift_down(shift_left(m))
 shift_dr <- function(m) shift_down(shift_right(m))
 
 part1 <- function(filename) {
-  lines <- read_lines(filename)
-
-  vprint("Read", length(lines), "lines from", filename)
-
   # Read the input into a grid, mapping '@' to 1 and '.' to 0
   grid <- read_grid(filename)
   grid_num <- matrix(0, nrow(grid), ncol(grid))
@@ -99,12 +97,120 @@ part1 <- function(filename) {
 }
 
 part2 <- function(filename) {
-  lines <- read_lines(filename)
+  # Set up GIF generation if requested
+  if (make_gif) {
+    tmp_dir <- tempdir()
+    frame_files <- c()
+    frame_num <- 0
 
-  vprint("Read", length(lines), "lines from", filename)
+    # Helper to render a matrix as a PNG frame
+    render_frame <- function(mat, title, is_heatmap = FALSE) {
+      frame_num <<- frame_num + 1
+      tmp_file <- file.path(tmp_dir, sprintf("frame_%04d.png", frame_num))
+      frame_files <<- c(frame_files, tmp_file)
 
-  # TODO: Implement solution
+      # Scale up for visibility
+      scale <- 10
+      width <- ncol(mat) * scale
+      height <- nrow(mat) * scale
+
+      png(tmp_file, width = width, height = height + 30)
+      par(mar = c(0, 0, 1.5, 0))
+
+      if (is_heatmap) {
+        # Heatmap: use a color gradient, cap at 9 for consistent colors
+        cols <- c("white", "#0000ff", "#6666ff", "#8888ee", "#9999dd",
+          "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026")
+        image(t(mat[nrow(mat):1, ]),
+          col = cols, zlim = c(0, 9),
+          axes = FALSE, main = title
+        )
+      } else {
+        # Binary grid: black and white
+        image(t(mat[nrow(mat):1, ]),
+          col = c("white", "black"), zlim = c(0, 1),
+          axes = FALSE, main = title
+        )
+      }
+      dev.off()
+    }
+  }
+
+  # Read the input into a grid, mapping '@' to 1 and '.' to 0
+  grid <- read_grid(filename)
+  grid_num <- matrix(0, nrow(grid), ncol(grid))
+  grid_num[grid == "@"] <- 1
+
+  prev <- NULL
   result <- 0
+  step <- 0
+
+  while (!identical(grid_num, prev)) {
+    step <- step + 1
+
+    # Capture starting grid frame
+    # if (make_gif) {
+    #   render_frame(grid_num, paste("Step", step, "- Current Grid"))
+    # }
+
+    grid_neighbor_count <-
+      shift_left(grid_num) +
+      shift_right(grid_num) +
+      shift_up(grid_num) +
+      shift_down(grid_num) +
+      shift_ul(grid_num) +
+      shift_ur(grid_num) +
+      shift_dl(grid_num) +
+      shift_dr(grid_num) +
+      grid_num
+
+    # Multiple by the original grid to zero out cells that were originally 0
+    new_grid <- grid_num * grid_neighbor_count
+    result <- result + sum(new_grid < 5 & new_grid > 0)
+
+    # Capture heatmap frame
+    if (make_gif) {
+      cat("Step", step, "- running total:", result, "\n")
+      render_frame(new_grid, paste("Step", step, "- Neighbor Count (heatmap)"), is_heatmap = TRUE)
+    }
+
+    # Optional: print the grids if verbose
+    if (verbose) {
+      # Generate a new grid, where cells with value 0 become '.',
+      #  cells >0 and <4 become 'x', and cells >=4 become '@'.
+      new_grid_char <- matrix(".", nrow(new_grid), ncol(new_grid))
+      new_grid_char[new_grid > 0 & new_grid < 5] <- "x"
+      new_grid_char[new_grid >= 5] <- "@"
+      cat("Generated grid:\n")
+      for (i in 1:nrow(new_grid_char)) {
+        cat(paste(new_grid_char[i, ], collapse = ""), "\n")
+      }
+    }
+
+    # Now normalize the grid for the next iteration:
+    #  Cells of value <5 become 0; cells of value >=5 become 1.
+    next_grid <- grid_num
+    next_grid[new_grid < 5] <- 0
+    next_grid[new_grid >= 5] <- 1
+
+    # Capture next_grid frame
+    # if (make_gif) {
+    #   render_frame(next_grid, paste("Step", step, "- Next Grid"))
+    # }
+
+    prev <- grid_num
+    grid_num <- next_grid
+  }
+
+  # Write out the gif using gifski
+  if (make_gif) {
+    suppressPackageStartupMessages(library(gifski))
+    cat("Combining", length(frame_files), "frames into GIF...\n")
+    gifski(frame_files, "part2.gif", delay = 0.5, progress = TRUE)
+    cat("Wrote animation to part2.gif\n")
+    # Clean up temp files
+    unlink(frame_files)
+  }
 
   cat("Part 2:", result, "\n")
 }
@@ -114,6 +220,10 @@ main <- function() {
     make_option(c("-v", "--verbose"),
       action = "store_true", default = FALSE,
       help = "Enable verbose output"
+    ),
+    make_option(c("-g", "--gif"),
+      action = "store_true", default = FALSE,
+      help = "Generate animated GIF (part 2 only)"
     )
   )
 
@@ -127,6 +237,7 @@ main <- function() {
   part <- args$args[1]
   filename <- args$args[2]
   verbose <<- args$options$verbose
+  make_gif <<- args$options$gif
 
   if (part == "1") {
     part1(filename)
