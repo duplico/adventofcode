@@ -223,6 +223,31 @@ tclsh advent.tcl 1 ../input.txt
 
 ---
 
+### R
+
+R from Debian is sufficient for Advent of Code. We use the `optparse` package for CLI argument parsing.
+
+```bash
+# Install from Debian repos
+sudo apt update
+sudo apt install -y r-base
+
+# Verify
+Rscript --version
+
+# Install optparse package
+Rscript -e 'install.packages("optparse", repos="https://cloud.r-project.org")'
+```
+
+**Usage:**
+
+```bash
+cd 02/r
+Rscript advent.R 1 ../input.txt
+```
+
+---
+
 ## Creating a New Day
 
 Once dependencies are installed:
@@ -278,6 +303,9 @@ make && ./advent 1 ../input.txt      # C
 
 cd 02/tcl
 tclsh advent.tcl 1 ../input.txt      # Tcl
+
+cd 02/r
+Rscript advent.R 1 ../input.txt       # R
 ```
 
 ## Interactive REPLs
@@ -289,6 +317,7 @@ Some languages support interactive REPLs for exploratory development and debuggi
 just repl 02 python      # Python with advent module pre-loaded
 just repl 02 clojure     # Clojure with rebel-readline and advent loaded
 just repl 02 tcl         # Basic Tcl shell
+just repl 02 r           # R interactive session
 
 # Or start directly
 cd 02/python
@@ -298,7 +327,7 @@ cd 02/clojure
 clj -M:rebel             # Enhanced REPL with auto-import
 ```
 
-**Supported languages:** Python, Clojure, Tcl
+**Supported languages:** Python, Clojure, Tcl, R
 
 The Clojure REPL uses [rebel-readline](https://github.com/bhauman/rebel-readline) for a better experience and automatically imports all functions from the `advent` namespace via `dev/user.clj`.
 
@@ -314,7 +343,8 @@ The Clojure REPL uses [rebel-readline](https://github.com/bhauman/rebel-readline
 │   ├── go/
 │   ├── clojure/
 │   ├── c/
-│   └── tcl/
+│   ├── tcl/
+│   └── r/
 ├── 01/                   # Day 01 (old single-language structure)
 │   └── ...
 ├── 02/                   # Day 02 (multi-language structure)

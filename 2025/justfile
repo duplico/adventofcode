@@ -72,6 +72,9 @@ new day lang:
         tcl)
             echo "Tcl project ready. Run 'tclsh advent.tcl 1 ../input.txt' to start."
             ;;
+        r)
+            echo "R project ready. Run 'Rscript advent.R 1 ../input.txt' to start."
+            ;;
     esac
 
     echo ""
@@ -148,6 +151,9 @@ run day lang part *args:
         tcl)
             tclsh advent.tcl "$PART" ../input.txt $ARGS
             ;;
+        r)
+            Rscript advent.R "$PART" ../input.txt $ARGS
+            ;;
         *)
             echo "Error: Unknown language '$LANG'"
             exit 1
@@ -192,6 +198,9 @@ sample day lang part *args:
         tcl)
             tclsh advent.tcl "$PART" ../sample_input.txt $ARGS
             ;;
+        r)
+            Rscript advent.R "$PART" ../sample_input.txt $ARGS
+            ;;
         *)
             echo "Error: Unknown language '$LANG'"
             exit 1
@@ -227,9 +236,12 @@ repl day lang:
         tcl)
             tclsh
             ;;
+        r)
+            R --no-save --quiet
+            ;;
         *)
             echo "Error: REPL not supported for '$LANG'"
-            echo "Supported languages: python, clojure, tcl"
+            echo "Supported languages: python, clojure, tcl, r"
             exit 1
             ;;
     esac
