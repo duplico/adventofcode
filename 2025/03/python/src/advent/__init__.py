@@ -12,6 +12,13 @@ def setup() -> None:
     """Perform any setup needed before running solutions."""
     pass
 
+def condense_number_recursive(number_str: str, output: str, n: int) -> int:
+    if n == 0:
+        return int(output)
+    max_digit = max(int(ch) for ch in number_str[:len(number_str) - n + 1])
+    max_index = number_str.index(str(max_digit))
+    return condense_number_recursive(number_str[max_index + 1:], output + str(max_digit), n - 1)
+
 def condense_number(number_str: str, target_len: int, verbose: int = 0) -> int:
     window_start = 0
     digits = [int(ch) for ch in number_str]
@@ -76,7 +83,8 @@ def part2(filename: str, verbose: int) -> None:
     if verbose >= 1:
         console.print(f"Read [cyan]{len(lines)}[/cyan] lines from [yellow]{filename}[/yellow]")
 
-    result = sum(condense_number(line, 12, verbose) for line in lines)
+    # result = sum(condense_number(line, 12, verbose) for line in lines)
+    result = sum(condense_number_recursive(line, "", 12) for line in lines)
 
     console.print(f"Part 2: [bold green]{result}[/bold green]")
 
