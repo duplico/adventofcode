@@ -236,7 +236,7 @@ sudo apt install -y r-base
 Rscript --version
 
 # Install optparse package
-Rscript -e 'install.packages("optparse", repos="https://cloud.r-project.org")'
+sudo Rscript -e 'install.packages("optparse", repos="https://cloud.r-project.org")'
 ```
 
 **Usage:**

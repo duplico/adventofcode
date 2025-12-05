@@ -23,8 +23,8 @@ read_grid <- function(filename) {
 }
 
 # Verbose print helper
-vprint <- function(..., level = 1) {
-  if (verbose >= level) {
+vprint <- function(...) {
+  if (verbose) {
     cat(..., "\n")
   }
 }
@@ -54,8 +54,8 @@ part2 <- function(filename) {
 main <- function() {
   option_list <- list(
     make_option(c("-v", "--verbose"),
-      action = "count", default = 0,
-      help = "Enable verbose output (-v, -vv)"
+      action = "store_true", default = FALSE,
+      help = "Enable verbose output"
     )
   )
 

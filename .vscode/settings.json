@@ -1,3 +1,13 @@
 {
-     "python.pythonPath": "2020\\venv\\Scripts\\python.exe"
+  "python.pythonPath": "2020\\venv\\Scripts\\python.exe",
+
+  // R formatting
+  "[r]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "reditorsupport.r"
+  },
+
+  // R extension settings
+  "r.lsp.enabled": true,
+  "r.lsp.diagnostics": true
 }

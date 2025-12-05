@@ -73,6 +73,8 @@ new day lang:
             echo "Tcl project ready. Run 'tclsh advent.tcl 1 ../input.txt' to start."
             ;;
         r)
+            echo "Checking R packages..."
+            Rscript -e 'lib <- Sys.getenv("R_LIBS_USER"); dir.create(lib, recursive=TRUE, showWarnings=FALSE); .libPaths(lib); pkgs <- c("optparse", "styler", "languageserver"); new_pkgs <- pkgs[!(pkgs %in% installed.packages()[,"Package"])]; if(length(new_pkgs)) { cat("Installing:", new_pkgs, "\n"); install.packages(new_pkgs, lib=lib, repos="https://cloud.r-project.org", quiet=FALSE) } else { cat("All packages already installed.\n") }'
             echo "R project ready. Run 'Rscript advent.R 1 ../input.txt' to start."
             ;;
     esac

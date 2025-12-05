@@ -1,0 +1,29 @@
+{
+  "recommendations": [
+    // Task runner
+    "skellock.just",
+
+    // Python
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "charliermarsh.ruff",
+
+    // Rust
+    "rust-lang.rust-analyzer",
+
+    // Go
+    "golang.go",
+
+    // Clojure
+    "betterthantomorrow.calva",
+
+    // C
+    "ms-vscode.cpptools",
+
+    // Tcl
+    "bitwisecook.tcl",
+
+    // R
+    "reditorsupport.r"
+  ]
+}
