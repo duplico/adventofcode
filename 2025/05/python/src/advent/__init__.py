@@ -60,19 +60,36 @@ def part1(filename: str, verbose: int) -> None:
 
     console.print(f"Part 1: [bold green]{result}[/bold green]")
 
-def merge_range_into_set(range_in: tuple[int, int], range_set: set[tuple[int, int]]) -> None:
+def merge_range_into_set(range_in: tuple[int, int], ranges: list[tuple[int, int]], verbose: int = 0) -> None:
     start_in, end_in = range_in
-    for existing_range in range_set:
+    pop_range = None
+    for existing_range in ranges:
         start, end = existing_range
         # If ranges overlap or are adjacent, pop the existing range from the set,
         #  merge them to create a new range, and recursively merge that new range back into the set.
+        if start_in <= end + 1 and end_in >= start - 1:
+            pop_range = existing_range
+            break
+    
+    if pop_range is None:
+        ranges.append(range_in)
+        if verbose >= 2:
+            console.print(f"Adding range [cyan]{range_in}[/cyan] to ranges")
+    else:
+        ranges.remove(pop_range)
+        start, end = pop_range
+        new_start = min(start, start_in)
+        new_end = max(end, end_in)
+        if verbose >= 2:
+            console.print(f"Merging range [cyan]{range_in}[/cyan] with existing range [cyan]{pop_range}[/cyan] to form new range [cyan]({new_start}, {new_end})[/cyan]")
+        merge_range_into_set((new_start, new_end), ranges)
 
 @cli.command(name="2")
 @common_options
 def part2(filename: str, verbose: int) -> None:
     """Run part 2 of the solution."""
 
-    fresh_ranges_in = set()
+    ranges = []
 
     with open(filename) as f:
         for line in f:
@@ -80,31 +97,14 @@ def part2(filename: str, verbose: int) -> None:
             if '-' in line:
                 start_str, end_str = line.split('-')
                 start, end = int(start_str), int(end_str)
-                fresh_ranges_in.add((start, end))
+                merge_range_into_set((start, end), ranges, verbose)
+                if verbose >= 1:
+                    console.print(f"Added [cyan]{(start, end)}[/cyan]; merged ranges: [cyan]{ranges}[/cyan]")
 
-    fresh_ranges = set()
-    fresh_ranges.add(fresh_ranges_in.pop())
-
-    while fresh_ranges_in:
-        start_in, end_in = fresh_ranges_in.pop()
-        for fresh_range in fresh_ranges:
-            start, end = fresh_range
-            # If ranges overlap or are adjacent, merge them
-            if not (end_in < start - 1 or start_in > end + 1):
-                # Merge ranges
-                new_start = min(start, start_in)
-                new_end = max(end, end_in)
-                fresh_ranges.remove(fresh_range)
-                fresh_ranges.add((new_start, new_end))
-                break
-            else: # Otherwise, add the input range to the 
-                fresh_ranges.add((start_in, end_in))
-
-    if verbose >= 1:
-        console.print(f"Read [cyan]{len(lines)}[/cyan] lines from [yellow]{filename}[/yellow]")
-
-    # TODO: Implement solution
     result = 0
+    # The result is the total number covered by all ranges, inclusive of start and end.
+    for start, end in ranges:
+        result += end - start + 1
 
     console.print(f"Part 2: [bold green]{result}[/bold green]")
 
