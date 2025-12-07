@@ -209,6 +209,56 @@ sample day lang part *args:
             ;;
     esac
 
+# Run with a custom input file
+# Usage: just run-input <day> <language> <part> <input-path> [args...]
+# Example: just run-input 02 python 1 ../other_input.txt -v
+run-input day lang part input *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    DAY="{{day}}"
+    LANG="{{lang}}"
+    PART="{{part}}"
+    INPUT="{{input}}"
+    ARGS="{{args}}"
+    TARGET_DIR="${DAY}/${LANG}"
+
+    if [[ ! -d "$TARGET_DIR" ]]; then
+        echo "Error: $TARGET_DIR does not exist"
+        echo "Create it with: just new $DAY $LANG"
+        exit 1
+    fi
+
+    cd "$TARGET_DIR"
+
+    case "$LANG" in
+        python)
+            uv run advent "$PART" "$INPUT" $ARGS
+            ;;
+        rust)
+            cargo run --release -- "$PART" "$INPUT" $ARGS
+            ;;
+        go)
+            go run . "$PART" "$INPUT" $ARGS
+            ;;
+        clojure)
+            clj -M:run "$PART" "$INPUT" $ARGS
+            ;;
+        c)
+            make -s && ./advent "$PART" "$INPUT" $ARGS
+            ;;
+        tcl)
+            tclsh advent.tcl "$PART" "$INPUT" $ARGS
+            ;;
+        r)
+            Rscript advent.R "$PART" "$INPUT" $ARGS
+            ;;
+        *)
+            echo "Error: Unknown language '$LANG'"
+            exit 1
+            ;;
+    esac
+
 # Open a REPL for a day/language (where supported)
 # Usage: just repl <day> <language>
 # Example: just repl 02 clojure
