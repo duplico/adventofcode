@@ -13,13 +13,17 @@ verbose <- FALSE
 read_lines <- function(filename) {
   lines <- readLines(filename, warn = FALSE)
   lines <- trimws(lines)
-  lines[lines != ""]
+  lines <- lines[lines != ""]
+  vprint("Read", length(lines), "lines from", filename)
+  lines
 }
 
 # Read file as a character matrix (grid)
 read_grid <- function(filename) {
   lines <- read_lines(filename)
-  do.call(rbind, strsplit(lines, ""))
+  grid <- do.call(rbind, strsplit(lines, ""))
+  vprint("Grid dimensions:", nrow(grid), "x", ncol(grid))
+  grid
 }
 
 # Verbose print helper
@@ -32,8 +36,6 @@ vprint <- function(...) {
 part1 <- function(filename) {
   lines <- read_lines(filename)
 
-  vprint("Read", length(lines), "lines from", filename)
-
   # TODO: Implement solution
   result <- 0
 
@@ -42,8 +44,6 @@ part1 <- function(filename) {
 
 part2 <- function(filename) {
   lines <- read_lines(filename)
-
-  vprint("Read", length(lines), "lines from", filename)
 
   # TODO: Implement solution
   result <- 0
